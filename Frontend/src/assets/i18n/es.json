@@ -1,0 +1,185 @@
+{
+    "HOME": {
+        "TITLE": "NAVEGANDO CONCIERTOS EN",
+        "NO_FEES_TITLE": "Sin cargos ocultos",
+        "NO_FEES_DESC": "El precio que ves es el que pagas.",
+        "TRUST_TITLE": "Garantía de Confianza",
+        "TRUST_DESC": "Boletos 100% auténticos.",
+        "MOBILE_TITLE": "Entrada Móvil",
+        "MOBILE_DESC": "Acceso fácil con tu celular.",
+        "NEWSLETTER_TITLE": "Nunca pierdas \n el ritmo",
+        "NEWSLETTER_DESC": "Suscríbete para acceso anticipado a boletos de tus artistas favoritos.",
+        "SUBSCRIBE": "SUSCRIBIRSE",
+        "EMAIL_PLACEHOLDER": "TU CORREO",
+        "SEARCH_PLACEHOLDER": "Buscar artista, evento o lugar...",
+        "SEARCH_BTN": "BUSCAR",
+        "NO_EVENTS": "No se encontraron eventos",
+        "FIND_TICKETS": "BUSCAR BOLETOS",
+        "FILTERS": {
+            "ALL": "TODOS",
+            "TODAY": "HOY",
+            "THIS_WEEKEND": "ESTE FINDE",
+            "THIS_MONTH": "ESTE MES",
+            "FESTIVAL": "FESTIVALES"
+        }
+    },
+    "NAV": {
+        "LOGIN": "Iniciar Sesión",
+        "REGISTER": "Registrarse",
+        "LOGOUT": "Cerrar Sesión",
+        "ADMIN": "Admin",
+        "CONCERTS": "Conciertos",
+        "SPORTS": "Deportes",
+        "THEATER": "Teatro",
+        "PROFILE": "Perfil"
+    },
+    "ADMIN": {
+        "NAV": {
+            "DASHBOARD": "Dashboard",
+            "VENUES": "Recintos",
+            "EVENTS": "Eventos",
+            "ORDERS": "Pedidos",
+            "CUSTOMERS": "Clientes",
+            "SETTINGS": "Ajustes"
+        }
+    },
+    "FOOTER": {
+        "RIGHTS": "© 2025 PD_Boletera. Todos los derechos reservados.",
+        "DESCRIPTION": "La forma más segura y transparente de comprar y vender boletos para tus eventos favoritos. Sin cargos ocultos, garantizado.",
+        "EXPLORE": "Explorar",
+        "SUPPORT": "Soporte",
+        "LINKS": {
+            "CONCERTS": "Conciertos",
+            "SPORTS": "Deportes",
+            "THEATER": "Teatro",
+            "FESTIVALS": "Festivales",
+            "HELP_CENTER": "Centro de Ayuda",
+            "CONTACT_US": "Contáctanos",
+            "PRIVACY": "Política de Privacidad",
+            "TERMS": "Términos de Servicio"
+        }
+    },
+    "LOGIN_PAGE": {
+        "TITLE": "Bienvenido de nuevo",
+        "SUBTITLE": "Ingresa a tu cuenta para continuar",
+        "EMAIL": "Correo Electrónico",
+        "PASSWORD": "Contraseña",
+        "BUTTON": "Iniciar Sesión",
+        "NO_ACCOUNT": "¿No tienes cuenta?",
+        "REGISTER_LINK": "Regístrate ahora"
+    },
+    "REGISTER_PAGE": {
+        "TITLE": "Crear Cuenta",
+        "SUBTITLE": "Únete a nosotros para comprar boletos",
+        "NAME": "Nombre Completo",
+        "EMAIL": "Correo Electrónico",
+        "PASSWORD": "Contraseña",
+        "CONFIRM_PASSWORD": "Confirmar Contraseña",
+        "BUTTON": "Registrarse",
+        "ALREADY_ACCOUNT": "¿Ya tienes cuenta?",
+        "LOGIN_LINK": "Inicia Sesión"
+    },
+    "EVENT_DETAIL": {
+        "SELECT_TICKETS": "Selecciona tus Boletos",
+        "AVAILABLE": "Disponibles",
+        "SUMMARY": "Resumen",
+        "TOTAL": "Total",
+        "CHECKOUT": "Pagar",
+        "CHECKOUT_PROCESSING": "Procesando...",
+        "NO_TICKETS": "No hay boletos disponibles.",
+        "SELECT_TO_PROCEED": "Selecciona boletos para continuar.",
+        "SECURE_CHECKOUT": "Pago seguro por Stripe",
+        "BUYER_GUARANTEE": "Garantía de reembolso 100%",
+        "QTY": "Cant",
+        "REMOVE": "Eliminar",
+        "DATE": "Fecha",
+        "VENUE": "Recinto",
+        "STARTS_AT": "Desde",
+        "MAP_TITLE": "Mapa Interactivo",
+        "MAP_LEGEND": {
+            "AVAILABLE": "Disponible",
+            "SOLD_OUT": "Agotado",
+            "SELECTED": "Seleccionado"
+        },
+        "MAP_INSTRUCTIONS": "Arrastra para mover, scroll para zoom. Clic en sección para seleccionar."
+    },
+    "CHECKOUT": {
+        "TITLE": "Pago Seguro",
+        "STEPS": {
+            "DELIVERY": "Entrega",
+            "BILLING": "Facturación",
+            "PLACE_ORDER": "Confirmar"
+        },
+        "GUEST": {
+            "TITLE": "Invitado",
+            "DESC": "Ingresa tu correo para recibir tus boletos.",
+            "EMAIL_LABEL": "Correo Electrónico",
+            "CONTINUE": "Continuar como Invitado"
+        },
+        "LOGIN": {
+            "TITLE": "Iniciar Sesión",
+            "DESC": "Ingresa para comprar más rápido y ganar recompensas."
+        },
+        "DELIVERY": {
+            "METHOD": "Transferencia Electrónica",
+            "DESC": "Las instrucciones y los boletos se enviarán a"
+        },
+        "BILLING": {
+            "PAYMENT_METHOD": "Método de Pago",
+            "CREDIT_CARD": "Tarjeta de Crédito",
+            "PAYPAL": "PayPal",
+            "ADDRESS": "Dirección de Facturación"
+        },
+        "ORDER_SUMMARY": {
+            "TITLE": "Detalles del Boleto",
+            "SECTION": "Sección",
+            "ROW": "Fila",
+            "NOTES": "Nota: Se requiere un dispositivo móvil para ingresar.",
+            "PRICE_EACH": "cada uno",
+            "QUANTITY": "Cantidad",
+            "TOTAL": "Total",
+            "PLACE_ORDER": "Realizar Pedido"
+        }
+    },
+    "PROFILE": {
+        "TITLE": "Mi Perfil",
+        "SUBTITLE": "Gestiona tus pedidos y boletos.",
+        "ORDER_HISTORY": "Historial de Pedidos",
+        "NO_ORDERS": "No se encontraron pedidos",
+        "NO_ORDERS_DESC": "Aún no has comprado boletos.",
+        "BROWSE_EVENTS": "Explorar Eventos",
+        "SIGN_OUT": "Cerrar Sesión",
+        "ORDER": {
+            "PLACED": "Pedido Realizado",
+            "TOTAL": "Total",
+            "NUMBER": "Pedido #",
+            "QTY": "Cant",
+            "VIEW_TICKET": "Ver Boleto"
+        }
+    },
+    "TICKET": {
+        "BACK_TO_PROFILE": "Volver al Perfil",
+        "YOUR_TICKET": "Tu Boleto",
+        "DATE": "Fecha",
+        "VENUE": "Recinto",
+        "TYPE": "Tipo de Boleto",
+        "ADMIT": "Admite"
+    },
+    "EVENTS": {
+        "TITLE": "Todos los Eventos",
+        "ALL": "Todos",
+        "SEARCH_PLACEHOLDER": "Buscar eventos...",
+        "NO_EVENTS": "No se encontraron eventos",
+        "NO_EVENTS_DESC": "Intenta ajustar tus términos de búsqueda."
+    },
+    "CONFIRMATION": {
+        "TITLE": "¡Pedido Confirmado!",
+        "SUBTITLE": "Gracias por tu compra. Tus boletos han sido enviados a tu correo.",
+        "ORDER_NUMBER": "Número de Pedido",
+        "TRANSACTION_ID": "ID de Transacción",
+        "DATE": "Fecha",
+        "TOTAL_PAID": "Total Pagado",
+        "VIEW_TICKETS": "Ver Mis Boletos",
+        "CONTINUE_SHOPPING": "Seguir Comprando"
+    }
+}

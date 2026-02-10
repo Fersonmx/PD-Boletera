@@ -1,0 +1,185 @@
+{
+    "HOME": {
+        "TITLE": "BROWSING CONCERTS IN",
+        "NO_FEES_TITLE": "No Service Fees",
+        "NO_FEES_DESC": "The price you see is the price you pay.",
+        "TRUST_TITLE": "Buyer Trust Guarantee",
+        "TRUST_DESC": "100% authentic tickets, on time.",
+        "MOBILE_TITLE": "Mobile Entry",
+        "MOBILE_DESC": "Easy access with your smartphone.",
+        "NEWSLETTER_TITLE": "Never miss \n a beat",
+        "NEWSLETTER_DESC": "Sign up for our newsletter to get first access to tickets for your favorite artists.",
+        "SUBSCRIBE": "SUBSCRIBE",
+        "EMAIL_PLACEHOLDER": "YOUR EMAIL",
+        "SEARCH_PLACEHOLDER": "Search by artist, event or venue...",
+        "SEARCH_BTN": "SEARCH",
+        "NO_EVENTS": "No events found",
+        "FIND_TICKETS": "FIND TICKETS",
+        "FILTERS": {
+            "ALL": "ALL",
+            "TODAY": "TODAY",
+            "THIS_WEEKEND": "THIS WEEKEND",
+            "THIS_MONTH": "THIS MONTH",
+            "FESTIVAL": "FESTIVALS"
+        }
+    },
+    "NAV": {
+        "LOGIN": "Login",
+        "REGISTER": "Register",
+        "LOGOUT": "Logout",
+        "ADMIN": "Admin",
+        "CONCERTS": "Concerts",
+        "SPORTS": "Sports",
+        "THEATER": "Theater",
+        "PROFILE": "Profile"
+    },
+    "ADMIN": {
+        "NAV": {
+            "DASHBOARD": "Dashboard",
+            "VENUES": "Venues",
+            "EVENTS": "Events",
+            "ORDERS": "Orders",
+            "CUSTOMERS": "Customers",
+            "SETTINGS": "Settings"
+        }
+    },
+    "FOOTER": {
+        "RIGHTS": "© 2025 PD_Boletera. All rights reserved.",
+        "DESCRIPTION": "The most secure and transparent way to buy and sell tickets for your favorite events. No hidden fees, guaranteed.",
+        "EXPLORE": "Explore",
+        "SUPPORT": "Support",
+        "LINKS": {
+            "CONCERTS": "Concerts",
+            "SPORTS": "Sports",
+            "THEATER": "Theater",
+            "FESTIVALS": "Festivals",
+            "HELP_CENTER": "Help Center",
+            "CONTACT_US": "Contact Us",
+            "PRIVACY": "Privacy Policy",
+            "TERMS": "Terms of Service"
+        }
+    },
+    "LOGIN_PAGE": {
+        "TITLE": "Welcome Back",
+        "SUBTITLE": "Sign in to your account to continue",
+        "EMAIL": "Email Address",
+        "PASSWORD": "Password",
+        "BUTTON": "Sign In",
+        "NO_ACCOUNT": "Don't have an account?",
+        "REGISTER_LINK": "Register now"
+    },
+    "REGISTER_PAGE": {
+        "TITLE": "Create Account",
+        "SUBTITLE": "Join us to purchase tickets",
+        "NAME": "Full Name",
+        "EMAIL": "Email Address",
+        "PASSWORD": "Password",
+        "CONFIRM_PASSWORD": "Confirm Password",
+        "BUTTON": "Sign Up",
+        "ALREADY_ACCOUNT": "Already have an account?",
+        "LOGIN_LINK": "Sign In"
+    },
+    "EVENT_DETAIL": {
+        "SELECT_TICKETS": "Select Tickets",
+        "AVAILABLE": "Available",
+        "SUMMARY": "Summary",
+        "TOTAL": "Total",
+        "CHECKOUT": "Checkout",
+        "CHECKOUT_PROCESSING": "Processing...",
+        "NO_TICKETS": "No tickets available.",
+        "SELECT_TO_PROCEED": "Select tickets to proceed.",
+        "SECURE_CHECKOUT": "Secure checkout via Stripe",
+        "BUYER_GUARANTEE": "100% Buyer Guarantee",
+        "QTY": "Qty",
+        "REMOVE": "Remove",
+        "DATE": "Date",
+        "VENUE": "Venue",
+        "STARTS_AT": "Starts at",
+        "MAP_TITLE": "Interactive Seat Map",
+        "MAP_LEGEND": {
+            "AVAILABLE": "Available",
+            "SOLD_OUT": "Sold Out",
+            "SELECTED": "Selected"
+        },
+        "MAP_INSTRUCTIONS": "Pan to move, Scroll to zoom. Click on a colored section to select tickets."
+    },
+    "CHECKOUT": {
+        "TITLE": "Secure Checkout",
+        "STEPS": {
+            "DELIVERY": "Delivery",
+            "BILLING": "Billing",
+            "PLACE_ORDER": "Place Order"
+        },
+        "GUEST": {
+            "TITLE": "Guest Checkout",
+            "DESC": "Enter your preferred email address to receive your tickets & order updates.",
+            "EMAIL_LABEL": "Email Address",
+            "CONTINUE": "Continue as Guest"
+        },
+        "LOGIN": {
+            "TITLE": "Sign In",
+            "DESC": "Sign in for faster checkout and earn rewards!"
+        },
+        "DELIVERY": {
+            "METHOD": "Electronic Transfer",
+            "DESC": "Delivery instructions and order updates will be sent to"
+        },
+        "BILLING": {
+            "PAYMENT_METHOD": "Payment Type & Billing",
+            "CREDIT_CARD": "Pay by credit card",
+            "PAYPAL": "PayPal",
+            "ADDRESS": "Billing Address"
+        },
+        "ORDER_SUMMARY": {
+            "TITLE": "Ticket Details",
+            "SECTION": "Section",
+            "ROW": "Row",
+            "NOTES": "Notes: Please note that you will need to use an iOS or Android mobile device to gain entry to your event.",
+            "PRICE_EACH": "each",
+            "QUANTITY": "Quantity",
+            "TOTAL": "Total",
+            "PLACE_ORDER": "Place Order"
+        }
+    },
+    "PROFILE": {
+        "TITLE": "My Profile",
+        "SUBTITLE": "Manage your orders and tickets.",
+        "ORDER_HISTORY": "Order History",
+        "NO_ORDERS": "No orders found",
+        "NO_ORDERS_DESC": "You haven't purchased any tickets yet.",
+        "BROWSE_EVENTS": "Browse Events",
+        "SIGN_OUT": "Sign Out",
+        "ORDER": {
+            "PLACED": "Order Placed",
+            "TOTAL": "Total",
+            "NUMBER": "Order #",
+            "QTY": "Qty",
+            "VIEW_TICKET": "View Ticket"
+        }
+    },
+    "TICKET": {
+        "BACK_TO_PROFILE": "Back to Profile",
+        "YOUR_TICKET": "Your Ticket",
+        "DATE": "Date",
+        "VENUE": "Venue",
+        "TYPE": "Ticket Type",
+        "ADMIT": "Admit"
+    },
+    "EVENTS": {
+        "TITLE": "All Events",
+        "ALL": "All",
+        "SEARCH_PLACEHOLDER": "Search events...",
+        "NO_EVENTS": "No events found",
+        "NO_EVENTS_DESC": "Try adjusting your search terms."
+    },
+    "CONFIRMATION": {
+        "TITLE": "Order Confirmed!",
+        "SUBTITLE": "Thank you for your purchase. Your tickets have been sent to your email.",
+        "ORDER_NUMBER": "Order Number",
+        "TRANSACTION_ID": "Transaction ID",
+        "DATE": "Date",
+        "TOTAL_PAID": "Total Paid",
+        "VIEW_TICKETS": "View My Tickets",
+        "CONTINUE_SHOPPING": "Continue Shopping"
+    }
+}
