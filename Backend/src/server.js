@@ -23,7 +23,9 @@ async function startServer() {
         app.use('/api/settings', require('./routes/settingRoutes'));
         app.use('/api/promocodes', require('./routes/promoCodeRoutes'));
         app.use('/api/content', require('./routes/contentRoutes'));
-        app.use('/api/upload', require('./routes/uploadRoutes')); // Ensuring upload is there too if needed
+        app.use('/api/upload', require('./routes/uploadRoutes'));
+        app.use('/api/stripe', require('./routes/stripeRoutes'));
+        app.use('/api/setup', require('./routes/setupRoutes'));
 
         app.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);

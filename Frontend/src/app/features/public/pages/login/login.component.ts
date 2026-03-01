@@ -38,6 +38,12 @@ import { environment } from '../../../../../environments/environment';
               </div>
             </div>
 
+            <div class="flex items-center justify-between mb-2">
+              <a routerLink="/forgot-password" class="text-sm font-medium text-pink-600 hover:text-pink-500">
+                {{ 'LOGIN_PAGE.FORGOT_PASSWORD' | translate }}
+              </a>
+            </div>
+
             <div>
               <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold uppercase tracking-wider text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors">
                 {{ 'LOGIN_PAGE.BUTTON' | translate }}

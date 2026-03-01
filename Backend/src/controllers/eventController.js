@@ -92,6 +92,10 @@ exports.getEventById = async (req, res) => {
 exports.createEvent = async (req, res) => {
     try {
         const { ticketConfigs, tiers, ...eventData } = req.body;
+
+        if (!eventData.venueId) return res.status(400).json({ message: 'Venue ID is required' });
+        if (!eventData.layoutId) return res.status(400).json({ message: 'Layout ID is required' });
+
         const event = await Event.create(eventData);
 
         // 1. Handle Tiers (if present)
@@ -99,7 +103,21 @@ exports.createEvent = async (req, res) => {
             for (const tierData of tiers) {
                 // tierData expected: { name, startDate, endDate, configs: { sectionId: { price, quantity }, ... } }
                 const { configs, ...tierInfo } = tierData;
-                const tier = await EventTier.create({ ...tierInfo, eventId: event.id });
+
+                // Fix invalid date
+                const startDate = tierInfo.startDate ? new Date(tierInfo.startDate) : null;
+                const endDate = tierInfo.endDate ? new Date(tierInfo.endDate) : null;
+
+                const validStartDate = startDate && !isNaN(startDate.getTime()) ? startDate : null;
+                const validEndDate = endDate && !isNaN(endDate.getTime()) ? endDate : null;
+
+                const safeTierInfo = {
+                    ...tierInfo,
+                    startDate: validStartDate,
+                    endDate: validEndDate
+                };
+
+                const tier = await EventTier.create({ ...safeTierInfo, eventId: event.id });
 
                 if (configs) {
                     for (const [sectionId, config] of Object.entries(configs)) {
@@ -118,7 +136,7 @@ exports.createEvent = async (req, res) => {
                             price = parseFloat(config);
                         }
 
-                        if (section && price !== null && price !== undefined) {
+                        if (section && price !== null && !isNaN(price)) {
                             await Ticket.create({
                                 eventId: event.id,
                                 tierId: tier.id,
@@ -127,8 +145,8 @@ exports.createEvent = async (req, res) => {
                                 price: price,
                                 quantity: quantity,
                                 available: quantity, // Start with full allocated quantity available
-                                salesStart: tier.startDate,
-                                salesEnd: tier.endDate
+                                salesStart: validStartDate,
+                                salesEnd: validEndDate
                             });
                         }
                     }
@@ -162,6 +180,10 @@ exports.createEvent = async (req, res) => {
 exports.updateEvent = async (req, res) => {
     try {
         const { tiers, ...eventData } = req.body;
+
+        if (!eventData.venueId) return res.status(400).json({ message: 'Venue ID is required' });
+        if (!eventData.layoutId) return res.status(400).json({ message: 'Layout ID is required' });
+
         const event = await Event.findByPk(req.params.id);
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
@@ -174,12 +196,25 @@ exports.updateEvent = async (req, res) => {
                 const { prices, id: tierId, ...tierInfo } = tierData;
                 let tier;
 
+                // Fix invalid date
+                const startDate = tierInfo.startDate ? new Date(tierInfo.startDate) : null;
+                const endDate = tierInfo.endDate ? new Date(tierInfo.endDate) : null;
+
+                const validStartDate = startDate && !isNaN(startDate.getTime()) ? startDate : null;
+                const validEndDate = endDate && !isNaN(endDate.getTime()) ? endDate : null;
+
+                const safeTierInfo = {
+                    ...tierInfo,
+                    startDate: validStartDate,
+                    endDate: validEndDate
+                };
+
                 // Update or Create Tier
                 if (tierId) {
                     tier = await EventTier.findByPk(tierId);
-                    if (tier) await tier.update(tierInfo);
+                    if (tier) await tier.update(safeTierInfo);
                 } else {
-                    tier = await EventTier.create({ ...tierInfo, eventId: event.id });
+                    tier = await EventTier.create({ ...safeTierInfo, eventId: event.id });
                 }
 
                 // Handle Configs/Tickets (Upsert)
@@ -207,7 +242,11 @@ exports.updateEvent = async (req, res) => {
                         });
 
                         if (existingTicket) {
-                            const updateData = { price: price };
+                            const updateData = {
+                                price: price,
+                                salesStart: validStartDate,
+                                salesEnd: validEndDate
+                            };
                             if (quantity !== null) {
                                 const section = await VenueSection.findByPk(sectionId);
                                 const maxCap = section ? section.capacity : 99999;
@@ -222,7 +261,7 @@ exports.updateEvent = async (req, res) => {
                             const section = await VenueSection.findByPk(sectionId);
                             const finalQty = (quantity !== null && section) ? Math.min(quantity, section.capacity) : (section ? section.capacity : 0);
 
-                            if (section && price !== null && price !== undefined) {
+                            if (section && price !== null && !isNaN(price)) {
                                 await Ticket.create({
                                     eventId: event.id,
                                     tierId: tier.id,
@@ -231,11 +270,39 @@ exports.updateEvent = async (req, res) => {
                                     price: price,
                                     quantity: finalQty,
                                     available: finalQty,
-                                    salesStart: tier.startDate,
-                                    salesEnd: tier.endDate
+                                    salesStart: validStartDate,
+                                    salesEnd: validEndDate
                                 });
                             }
                         }
+                    }
+                }
+            }
+        }
+        // Fallback to standard ticket configs (No Tiers) update
+        else if (req.body.ticketConfigs && req.body.ticketConfigs.length > 0) {
+            for (const config of req.body.ticketConfigs) {
+                const existingTicket = await Ticket.findOne({
+                    where: {
+                        eventId: event.id,
+                        tierId: null,
+                        sectionId: config.sectionId
+                    }
+                });
+
+                if (existingTicket) {
+                    await existingTicket.update({ price: config.price });
+                } else {
+                    const section = await VenueSection.findByPk(config.sectionId);
+                    if (section) {
+                        await Ticket.create({
+                            eventId: event.id,
+                            sectionId: section.id,
+                            name: section.name,
+                            price: config.price,
+                            quantity: section.capacity, // Default to full capacity
+                            available: section.capacity
+                        });
                     }
                 }
             }
@@ -250,14 +317,40 @@ exports.updateEvent = async (req, res) => {
 
 exports.deleteEvent = async (req, res) => {
     try {
-        const event = await Event.findByPk(req.params.id);
+        const eventId = req.params.id;
+        const event = await Event.findByPk(eventId);
+
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
         }
+
+        // Check if there are any sold tickets
+        const tickets = await Ticket.findAll({ where: { eventId } });
+        const hasSoldTickets = tickets.some(t => t.quantity > t.available);
+
+        if (hasSoldTickets) {
+            return res.status(400).json({
+                message: 'Cannot delete event. There are tickets already sold for this event.'
+            });
+        }
+
+        // If safe to delete, destroy dependencies manually since cascade might not be configured
+        await Ticket.destroy({ where: { eventId } });
+
+        if (typeof EventTier !== 'undefined') {
+            await EventTier.destroy({ where: { eventId } });
+        }
+
+        // Also remove from hero slides if applicable
+        const { HeroSlide } = require('../models');
+        if (HeroSlide) {
+            await HeroSlide.destroy({ where: { eventId } });
+        }
+
         await event.destroy();
-        res.json({ message: 'Event deleted' });
+        res.json({ message: 'Event deleted successfully' });
     } catch (error) {
-        console.error(error);
+        console.error('Error deleting event:', error);
         res.status(500).json({ message: 'Server Error' });
     }
 };

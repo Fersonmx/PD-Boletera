@@ -29,8 +29,12 @@ export class ContentService {
     }
 
     // --- Pages ---
-    getPageBySlug(slug: string): Observable<any> {
-        return this.http.get<any>(`${this.apiUrl}/pages/${slug}`);
+    getPageBySlug(slug: string, lang?: string): Observable<any> {
+        let url = `${this.apiUrl}/pages/${slug}`;
+        if (lang) {
+            url += `?lang=${lang}`;
+        }
+        return this.http.get<any>(url);
     }
 
     getAuthPages(): Observable<any[]> {
@@ -47,5 +51,9 @@ export class ContentService {
 
     deletePage(id: number): Observable<any> {
         return this.http.delete<any>(`${this.apiUrl}/pages/${id}`);
+    }
+
+    sendContactForm(slug: string, data: any): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/pages/${slug}/contact`, data);
     }
 }

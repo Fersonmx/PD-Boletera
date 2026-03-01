@@ -80,6 +80,18 @@ export class AuthService {
         );
     }
 
+    updatePassword(data: any): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/password`, data);
+    }
+
+    forgotPassword(email: string): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email });
+    }
+
+    resetPassword(token: string, password: string): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/reset-password`, { token, password });
+    }
+
     register(data: { name: string, email: string, password: string, phoneNumber?: string }): Observable<any> {
         // Response can be AuthResponse OR { message, userId, requires2FA }
         return this.http.post<any>(`${this.apiUrl}/register`, data).pipe(

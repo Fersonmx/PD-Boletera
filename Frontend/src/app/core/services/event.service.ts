@@ -52,6 +52,7 @@ export interface Event {
     Tickets?: Ticket[];
     VenueLayout?: VenueLayout;
     currency?: string;
+    showMap?: boolean;
     tiers?: EventTier[];
 }
 

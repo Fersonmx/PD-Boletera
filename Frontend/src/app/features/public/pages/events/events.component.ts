@@ -13,7 +13,7 @@ import { environment } from '../../../../../environments/environment';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, DatePipe, TranslateModule],
   template: `
-    <div class="bg-gray-50 min-h-screen py-12 selection:bg-pink-500 selection:text-white">
+    <div class="bg-gray-50 min-h-screen py-12 selection:bg-primary selection:text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Header & Search -->
@@ -29,10 +29,10 @@ import { environment } from '../../../../../environments/environment';
                 type="text" 
                 [(ngModel)]="searchQuery"
                 (keyup.enter)="onSearch()"
-                class="focus:ring-pink-500 focus:border-pink-500 block w-full pl-5 pr-12 text-base border-gray-300 rounded-lg h-12 font-bold text-gray-900 shadow-sm" 
+                class="focus:ring-primary focus:border-primary block w-full pl-5 pr-12 text-base border-gray-300 rounded-lg h-12 font-bold text-gray-900 shadow-sm" 
                 placeholder="{{ 'EVENTS.SEARCH_PLACEHOLDER' | translate }}">
               <div class="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer" (click)="onSearch()">
-                <i class="fas fa-search text-gray-400 hover:text-pink-600 transition-colors"></i>
+                <i class="fas fa-search text-gray-400 hover:text-primary transition-colors"></i>
               </div>
             </div>
           </div>
@@ -44,8 +44,8 @@ import { environment } from '../../../../../environments/environment';
           <button 
             (click)="selectCategory(null)"
             [class]="selectedCategory() === null 
-                ? 'px-5 py-2 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition shadow-lg' 
-                : 'px-5 py-2 rounded-full bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-100 hover:text-pink-600 transition shadow-sm'">
+                ? 'px-5 py-2 rounded-full bg-primary text-white text-xs font-bold uppercase tracking-wider hover:bg-secondary hover:text-black transition shadow-lg' 
+                : 'px-5 py-2 rounded-full bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-100 hover:text-primary transition shadow-sm'">
             {{ 'EVENTS.ALL' | translate }}
           </button>
           
@@ -53,8 +53,8 @@ import { environment } from '../../../../../environments/environment';
             <button 
                 (click)="selectCategory(cat.id)"
                 [class]="selectedCategory() === cat.id 
-                    ? 'px-5 py-2 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition shadow-lg' 
-                    : 'px-5 py-2 rounded-full bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-100 hover:text-pink-600 transition shadow-sm'">
+                    ? 'px-5 py-2 rounded-full bg-primary text-white text-xs font-bold uppercase tracking-wider hover:bg-secondary hover:text-black transition shadow-lg' 
+                    : 'px-5 py-2 rounded-full bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-100 hover:text-primary transition shadow-sm'">
                 {{ cat.name }}
             </button>
           }
@@ -63,7 +63,7 @@ import { environment } from '../../../../../environments/environment';
         <!-- Events Grid -->
         @if (isLoading()) {
           <div class="flex justify-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         }
 
@@ -77,12 +77,12 @@ import { environment } from '../../../../../environments/environment';
 
         <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           @for (event of filteredEvents(); track event.id) {
-            <div class="group flex flex-col h-full bg-white rounded-lg transition-transform duration-300 hover:-translate-y-1 cursor-pointer" [routerLink]="['/events', event.id]">
+            <div class="group flex flex-col h-full bg-white rounded-lg transition-transform duration-300 md:hover:-translate-y-1 cursor-pointer" [routerLink]="['/events', event.id]">
               <!-- Image Card -->
               <div class="relative aspect-[3/2] bg-gray-100 mb-4 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md">
                  <img [src]="getImageUrl(event.imageUrl) || 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&fit=crop&w=800&q=80'" 
                       alt="{{ event.title }}" 
-                      class="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105">
+                      class="object-cover w-full h-full grayscale-0 md:grayscale md:group-hover:grayscale-0 transition-all duration-500 transform md:group-hover:scale-105">
                  
                  <!-- Date Badge Overlay -->
                  <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-md text-center shadow-sm">
@@ -104,23 +104,22 @@ import { environment } from '../../../../../environments/environment';
 
               <!-- Info -->
               <div class="flex flex-col flex-1 px-1">
-                 <h3 class="text-lg font-black leading-tight mb-2 uppercase tracking-tight text-gray-900 group-hover:text-pink-600 transition-colors line-clamp-2">
+                 <h3 class="text-lg font-black leading-tight mb-2 uppercase tracking-tight text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
                      {{ event.title }}
                  </h3>
                  
-                 <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                    <div class="flex flex-col">
+                 <div class="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-4">
+                    <div class="flex flex-col w-full">
                       <span class="text-xs font-bold uppercase tracking-wide text-gray-500">
                         {{ event.Venue?.city }}
                       </span>
-                      <span class="text-[10px] text-gray-400 font-medium truncate max-w-[120px]">
+                      <span class="text-[10px] text-gray-400 font-medium truncate w-full">
                         {{ event.Venue?.name }}
                       </span>
                     </div>
 
-                    <span class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-pink-600 hover:text-pink-800 transition-colors whitespace-nowrap">
+                    <span class="inline-flex items-center justify-center px-6 py-3 bg-primary text-white rounded-full font-bold uppercase tracking-wider text-xs hover:bg-secondary hover:text-black transition-all shadow-md hover:shadow-primary/20 w-full">
                         {{ 'HOME.FIND_TICKETS' | translate }}
-                        <i class="fas fa-arrow-right ml-1 transform group-hover:translate-x-1 transition-transform"></i>
                     </span>
                  </div>
               </div>

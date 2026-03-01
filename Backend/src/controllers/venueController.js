@@ -1,4 +1,4 @@
-const { Venue, VenueSection, VenueLayout } = require('../models');
+const { Venue, VenueSection, VenueLayout, Ticket } = require('../models');
 
 exports.getVenues = async (req, res) => {
     try {
@@ -94,9 +94,25 @@ exports.updateVenue = async (req, res) => {
         // 2. iterate layouts.
 
         if (req.body.layouts) {
-            // For MVP simplicity: If we are sending layouts, we might just be adding new ones or updating names.
-            // Let's implement a "Replace All" logic if desired, OR a "Upsert" logic.
-            // Given the complexity, let's just create new ones if they don't have ID, and update if they do.
+            // Secure Layout Deletion Phase
+            const existingLayouts = await VenueLayout.findAll({ where: { venueId: venue.id } });
+            const existingLayoutIds = existingLayouts.map(l => l.id);
+            const incomingLayoutIds = req.body.layouts.filter(l => l.id).map(l => l.id);
+            const layoutsToDelete = existingLayoutIds.filter(id => !incomingLayoutIds.includes(id));
+
+            if (layoutsToDelete.length > 0) {
+                // Check if any sections in these layouts have active tickets referencing them
+                const sectionsInLayouts = await VenueSection.findAll({ where: { layoutId: layoutsToDelete } });
+                const sectionIds = sectionsInLayouts.map(s => s.id);
+                if (sectionIds.length > 0) {
+                    const linkedTickets = await Ticket.count({ where: { sectionId: sectionIds } });
+                    if (linkedTickets > 0) {
+                        return res.status(400).json({ message: 'No puedes borrar este layout porque contiene secciones que ya tienen boletos creados/vendidos.' });
+                    }
+                }
+                // Safe to delete layouts
+                await VenueLayout.destroy({ where: { id: layoutsToDelete } });
+            }
 
             for (const layoutData of req.body.layouts) {
                 let layout;
@@ -142,10 +158,16 @@ exports.updateVenue = async (req, res) => {
                     // Delete removed
                     const sectionsToDelete = existingIds.filter(id => !incomingIds.includes(id));
                     if (sectionsToDelete.length > 0) {
+                        // Check if these specific sections have tickets
+                        const linkedTickets = await Ticket.count({ where: { sectionId: sectionsToDelete } });
+                        if (linkedTickets > 0) {
+                            return res.status(400).json({ message: 'No puedes borrar esta sección porque ya está vinculada a eventos/boletos emitidos.' });
+                        }
+
                         try {
                             await VenueSection.destroy({ where: { id: sectionsToDelete } });
                         } catch (err) {
-                            console.warn("Could not delete some sections (likely linked to tickets):", sectionsToDelete);
+                            console.warn("Could not delete some sections:", sectionsToDelete);
                         }
                     }
                 }

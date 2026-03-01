@@ -37,6 +37,8 @@ const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const promoCodeRoutes = require('./routes/promoCodeRoutes');
+const contentRoutes = require('./routes/contentRoutes');
+const settingRoutes = require('./routes/settingRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
@@ -47,6 +49,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/promocodes', promoCodeRoutes);
+app.use('/api/content', contentRoutes);
+app.use('/api/settings', settingRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

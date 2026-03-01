@@ -2,51 +2,52 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PromoService } from '../../../../core/services/promo.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-promo-codes',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslateModule],
     template: `
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <div>
-           <h1 class="text-2xl font-bold text-gray-900">Promo Codes</h1>
-           <p class="text-gray-500 text-sm">Manage discounts and coupons</p>
+           <h1 class="text-2xl font-bold text-gray-900">{{ 'ADMIN.PROMOS.TITLE' | translate }}</h1>
+           <p class="text-gray-500 text-sm">{{ 'ADMIN.PROMOS.DESC' | translate }}</p>
         </div>
         <button (click)="showForm = true" class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition flex items-center gap-2">
-           <i class="fas fa-plus"></i> New Code
+           <i class="fas fa-plus"></i> {{ 'ADMIN.PROMOS.NEW' | translate }}
         </button>
       </div>
 
       <!-- Create Form -->
       @if(showForm) {
           <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 animate-fadeIn">
-              <h3 class="text-lg font-bold mb-4">Create Promo Code</h3>
+              <h3 class="text-lg font-bold mb-4">{{ 'ADMIN.PROMOS.CREATE' | translate }}</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
-                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Code</label>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">{{ 'ADMIN.PROMOS.CODE' | translate }}</label>
                       <input [(ngModel)]="newPromo.code" placeholder="SUMMER2024" class="w-full border-gray-300 rounded-lg uppercase">
                   </div>
                   <div>
-                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Type</label>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">{{ 'ADMIN.PROMOS.TYPE' | translate }}</label>
                       <select [(ngModel)]="newPromo.discountType" class="w-full border-gray-300 rounded-lg">
-                          <option value="fixed">Fixed Amount ($)</option>
-                          <option value="percentage">Percentage (%)</option>
+                          <option value="fixed">{{ 'ADMIN.PROMOS.FIXED' | translate }}</option>
+                          <option value="percentage">{{ 'ADMIN.PROMOS.PERC' | translate }}</option>
                       </select>
                   </div>
                   <div>
-                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Value</label>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">{{ 'ADMIN.PROMOS.VAL' | translate }}</label>
                       <input [(ngModel)]="newPromo.discountValue" type="number" placeholder="10" class="w-full border-gray-300 rounded-lg">
                   </div>
                    <div>
-                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Limit (Optional)</label>
+                      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">{{ 'ADMIN.PROMOS.LIM' | translate }}</label>
                       <input [(ngModel)]="newPromo.usageLimit" type="number" placeholder="Unlimited" class="w-full border-gray-300 rounded-lg">
                   </div>
               </div>
               <div class="flex justify-end gap-2 mt-4">
-                  <button (click)="cancelCreate()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
-                  <button (click)="createCode()" [disabled]="!newPromo.code || !newPromo.discountValue" class="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50">Save</button>
+                  <button (click)="cancelCreate()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">{{ 'ADMIN.PROMOS.CANCEL' | translate }}</button>
+                  <button (click)="createCode()" [disabled]="!newPromo.code || !newPromo.discountValue" class="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50">{{ 'ADMIN.PROMOS.SAVE' | translate }}</button>
               </div>
           </div>
       }
@@ -57,11 +58,11 @@ import { PromoService } from '../../../../core/services/promo.service';
               <table class="w-full text-left text-sm text-gray-600">
                   <thead class="bg-gray-50 text-xs uppercase font-bold text-gray-500">
                       <tr>
-                          <th class="px-6 py-3">Code</th>
-                          <th class="px-6 py-3">Discount</th>
-                          <th class="px-6 py-3">Usage</th>
-                          <th class="px-6 py-3">Status</th>
-                          <th class="px-6 py-3 text-right">Actions</th>
+                          <th class="px-6 py-3">{{ 'ADMIN.PROMOS.TH_CODE' | translate }}</th>
+                          <th class="px-6 py-3">{{ 'ADMIN.PROMOS.TH_DISC' | translate }}</th>
+                          <th class="px-6 py-3">{{ 'ADMIN.PROMOS.TH_USAGE' | translate }}</th>
+                          <th class="px-6 py-3">{{ 'ADMIN.PROMOS.TH_STATUS' | translate }}</th>
+                          <th class="px-6 py-3 text-right">{{ 'ADMIN.PROMOS.TH_ACT' | translate }}</th>
                       </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-100">
@@ -79,16 +80,16 @@ import { PromoService } from '../../../../core/services/promo.service';
                                   {{ promo.usedCount }} / {{ promo.usageLimit || '∞' }}
                               </td>
                                <td class="px-6 py-4">
-                                  <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">Active</span>
+                                  <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">{{ 'ADMIN.PROMOS.ACTIVE' | translate }}</span>
                               </td>
                               <td class="px-6 py-4 text-right">
-                                  <button (click)="deleteCode(promo.id)" class="text-red-600 hover:text-red-900 font-bold text-xs uppercase">Delete</button>
+                                  <button (click)="deleteCode(promo.id)" class="text-red-600 hover:text-red-900 font-bold text-xs uppercase">{{ 'ADMIN.PROMOS.DELETE' | translate }}</button>
                               </td>
                           </tr>
                       }
                       @if (promoCodes().length === 0) {
                           <tr>
-                              <td colspan="5" class="px-6 py-8 text-center text-gray-400 italic">No promo codes found</td>
+                              <td colspan="5" class="px-6 py-8 text-center text-gray-400 italic">{{ 'ADMIN.PROMOS.EMPTY' | translate }}</td>
                           </tr>
                       }
                   </tbody>

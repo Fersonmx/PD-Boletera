@@ -2,30 +2,33 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../../core/services/user.service';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-users-list',
   standalone: true,
-  imports: [CommonModule, DatePipe, FormsModule],
+  imports: [CommonModule, DatePipe, FormsModule, RouterModule, TranslateModule],
   template: `
     <div class="px-0 sm:px-0 lg:px-0">
       <div class="sm:flex sm:items-center justify-between mb-8">
         <div class="sm:flex-auto">
-          <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tight">Customers</h1>
+          <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tight">{{ 'ADMIN.USERS_LIST.TITLE' | translate }}</h1>
           <p class="mt-2 text-sm text-gray-500">A list of all registered users/customers in your system.</p>
         </div>
         <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-           <!-- Potential "Add User" or Export button -->
+           <a routerLink="/admin/users/new" class="block rounded-lg bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{ 'ADMIN.USERS_LIST.BTN_CREATE' | translate }}</a>
         </div>
       </div>
       
        <!-- Search Bar -->
       <div class="flex gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-6">
          <div class="relative flex-1">
-            <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search by Name or Email..." class="w-full pl-10 pr-4 py-2.5 rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm font-medium">
+            <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" [placeholder]="'ADMIN.USERS_LIST.SEARCH' | translate" class="w-full pl-10 pr-4 py-2.5 rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-sm font-medium">
              <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
          </div>
-         <button (click)="onSearch()" class="px-6 py-2.5 bg-black text-white rounded-lg font-bold uppercase tracking-wider text-xs hover:bg-gray-800 transition-colors">Search</button>
+         <button (click)="onSearch()" class="px-6 py-2.5 bg-black text-white rounded-lg font-bold uppercase tracking-wider text-xs hover:bg-gray-800 transition-colors">{{ 'HOME.SEARCH_BTN' | translate }}</button>
       </div>
 
       <div class="mt-8 flow-root">
@@ -36,10 +39,13 @@ import { UserService } from '../../../../core/services/user.service';
                 <thead class="bg-gray-50">
                   <tr>
                     <th scope="col" class="py-4 pl-4 pr-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 sm:pl-6">ID</th>
-                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Name</th>
-                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Email</th>
-                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Role</th>
+                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{{ 'ADMIN.USERS_LIST.TH_NAME' | translate }}</th>
+                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{{ 'ADMIN.USERS_LIST.TH_EMAIL' | translate }}</th>
+                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{{ 'ADMIN.USERS_LIST.TH_ROLE' | translate }}</th>
                     <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Joined</th>
+                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                        <span class="sr-only">{{ 'ADMIN.USERS_LIST.BTN_EDIT' | translate }}</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 bg-white">
@@ -58,11 +64,14 @@ import { UserService } from '../../../../core/services/user.service';
                         </span>
                       </td>
                       <td class="whitespace-nowrap px-3 py-4 text-xs font-medium text-gray-400 uppercase tracking-wide">{{ user.createdAt | date:'mediumDate' }}</td>
+                      <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                         <a [routerLink]="['/admin/users/edit', user.id]" class="text-indigo-600 hover:text-indigo-900 mr-4">{{ 'ADMIN.USERS_LIST.BTN_EDIT' | translate }}<span class="sr-only">, {{ user.name }}</span></a>
+                      </td>
                     </tr>
                   }
                   @if (users().length === 0) {
                     <tr>
-                        <td colspan="5" class="text-center py-12 text-gray-400 italic">No users found.</td>
+                        <td colspan="5" class="text-center py-12 text-gray-400 italic">{{ 'ADMIN.USERS_LIST.EMPTY' | translate }}</td>
                     </tr>
                   }
                 </tbody>
@@ -70,10 +79,10 @@ import { UserService } from '../../../../core/services/user.service';
 
               <!-- Pagination -->
               <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-                   <span class="text-xs font-bold uppercase tracking-wide text-gray-500">Page {{ currentPage }} of {{ totalPages }} ({{ totalItems }} Total)</span>
+                   <span class="text-xs font-bold uppercase tracking-wide text-gray-500">{{ 'ADMIN.EVENTS_LIST.PG_PAGE' | translate }} {{ currentPage }} {{ 'ADMIN.EVENTS_LIST.PG_OF' | translate }} {{ totalPages }} ({{ totalItems }} {{ 'ADMIN.EVENTS_LIST.PG_TOTAL' | translate }})</span>
                    <div class="flex gap-2">
-                        <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">Previous</button>
-                        <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">Next</button>
+                        <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">{{ 'ADMIN.EVENTS_LIST.BTN_PREV' | translate }}</button>
+                        <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">{{ 'ADMIN.EVENTS_LIST.BTN_NEXT' | translate }}</button>
                    </div>
               </div>
             </div>

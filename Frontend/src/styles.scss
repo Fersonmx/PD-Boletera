@@ -4,7 +4,34 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Fallback: Import Quill styles directly here in case angular.json changes aren't hot-reloaded */
+@import 'quill/dist/quill.core.css';
+@import 'quill/dist/quill.snow.css';
+
 body {
     font-family: 'Inter', sans-serif;
 }
 
+/* Custom overrides for Quill editor to look more integrated */
+.ql-toolbar.ql-snow {
+    border: none !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    background-color: #f9fafb;
+    padding: 12px !important;
+    border-radius: 12px 12px 0 0;
+}
+
+.ql-container.ql-snow {
+    border: none !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 16px !important;
+}
+
+.ql-editor {
+    min-height: 400px;
+    padding: 24px !important;
+}
+
+.quill-container {
+    border-radius: 12px !important;
+}

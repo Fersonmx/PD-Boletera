@@ -33,7 +33,7 @@ import { environment } from '../../../../../environments/environment';
               <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                   <!-- Text Content -->
                   <div class="flex-1 text-center lg:text-left space-y-8">
-                      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-400 text-sm font-bold tracking-wider uppercase backdrop-blur-sm">
+                      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#6337ff]/10 border border-[#6337ff]/20 text-[#6337ff] text-sm font-bold tracking-wider uppercase backdrop-blur-sm">
                           <i class="fas fa-star text-xs"></i>
                           <span>{{ event()?.Category?.name || 'Event' }}</span>
                       </div>
@@ -44,7 +44,7 @@ import { environment } from '../../../../../environments/environment';
                       
                       <div class="flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-8 text-gray-300 text-lg font-medium">
                            <div class="flex items-center gap-4 group">
-                              <div class="w-12 h-12 rounded-2xl bg-gray-800/80 backdrop-blur-sm flex items-center justify-center text-pink-500 shadow-lg group-hover:scale-110 transition-transform duration-300 border border-gray-700">
+                              <div class="w-12 h-12 rounded-2xl bg-gray-800/80 backdrop-blur-sm flex items-center justify-center text-[#6337ff] shadow-lg group-hover:scale-110 transition-transform duration-300 border border-gray-700">
                                    <i class="far fa-calendar-alt text-xl"></i>
                               </div>
                                <div class="text-left">
@@ -95,7 +95,7 @@ import { environment } from '../../../../../environments/environment';
           <div class="lg:col-span-2 space-y-8">
             
             <!-- Interactive Map Section -->
-             @if (event()?.VenueLayout && hasVisualSections()) {
+             @if (event()?.VenueLayout && hasVisualSections() && event()?.showMap !== false) {
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative group">
                     <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 z-20 relative">
                         <h3 class="font-bold text-gray-900">{{ 'EVENT_DETAIL.MAP_TITLE' | translate }}</h3>
@@ -164,7 +164,7 @@ import { environment } from '../../../../../environments/environment';
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-2xl font-bold text-gray-900">{{ 'EVENT_DETAIL.SELECT_TICKETS' | translate }}</h2>
                     @if (activeTier()) {
-                        <div class="px-4 py-1.5 bg-pink-600 text-white rounded-full text-sm font-bold uppercase tracking-wider shadow-md animate-pulse">
+                        <div class="px-4 py-1.5 bg-[#6337ff] text-white rounded-full text-sm font-bold uppercase tracking-wider shadow-md animate-pulse">
                             <i class="fas fa-clock mr-2"></i> Phase: {{ activeTier()?.name }}
                         </div>
                     }

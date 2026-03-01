@@ -92,8 +92,8 @@ import { environment } from '../../../../../environments/environment';
                 </div>
               </div>
               
-              <!-- Ticket Pricing Configurator (Create Mode) -->
-              @if (!isEditMode && selectedLayoutSections().length > 0) {
+              <!-- Ticket Pricing Configurator (Create Mode & Edit Mode) -->
+              @if (selectedLayoutSections().length > 0) {
                   <div class="col-span-full bg-pink-50 rounded-xl p-6 border border-pink-100">
                       <div class="flex items-center justify-between mb-4">
                           <div>
@@ -158,11 +158,11 @@ import { environment } from '../../../../../environments/environment';
                              <div class="bg-white/50 rounded-xl p-4 border border-pink-100">
                                  <h4 class="text-xs font-black uppercase text-pink-900 mb-4 tracking-wide">Pricing by Phase</h4>
                                  <div class="space-y-6">
-                                     @for (tier of tiers; track $index) {
+                                     @for (tier of tiers; track $index; let tierIndex = $index) {
                                          <div>
                                              <div class="flex items-center gap-2 mb-2">
                                                  <div class="h-2 w-2 rounded-full bg-pink-500"></div>
-                                                 <h5 class="font-bold text-xs uppercase text-gray-700">{{ tier.name || 'Phase ' + ($index + 1) }}</h5>
+                                                 <h5 class="font-bold text-xs uppercase text-gray-700">{{ tier.name || 'Phase ' + (tierIndex + 1) }}</h5>
                                              </div>
                                              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                                                  @for (section of selectedLayoutSections(); track section.id) {
@@ -172,7 +172,7 @@ import { environment } from '../../../../../environments/environment';
                                                          <!-- Price Input -->
                                                          <div class="relative mb-1">
                                                              <span class="absolute left-2 top-1.5 text-xs text-gray-400">$</span>
-                                                             <input type="number" [(ngModel)]="tierPrices[$index][section.id!]" [name]="'price-' + $index + '-' + section.id" class="block w-full border border-gray-100 rounded p-1 pl-5 text-sm font-bold text-gray-900 placeholder-gray-300 focus:ring-0 focus:border-pink-500" placeholder="Price">
+                                                             <input type="number" [(ngModel)]="tierPrices[tierIndex][section.id!]" [name]="'price-' + tierIndex + '-' + section.id" class="block w-full border border-gray-100 rounded p-1 pl-5 text-sm font-bold text-gray-900 placeholder-gray-300 focus:ring-0 focus:border-pink-500" placeholder="Price">
                                                          </div>
                                                          
                                                          <!-- Limit Input -->
@@ -180,23 +180,23 @@ import { environment } from '../../../../../environments/environment';
                                                              <div class="relative flex-1">
                                                                  <span class="absolute left-2 top-1.5 text-[10px] text-gray-400">#</span>
                                                                  <input type="number" 
-                                                                        [(ngModel)]="tierLimits[$index][section.id!]" 
-                                                                        [name]="'limit-' + $index + '-' + section.id" 
+                                                                        [(ngModel)]="tierLimits[tierIndex][section.id!]" 
+                                                                        [name]="'limit-' + tierIndex + '-' + section.id" 
                                                                         [placeholder]="'Max (' + section.capacity + ')'"
-                                                                        [disabled]="tierLimits[$index][section.id!] === null"
+                                                                        [disabled]="tierLimits[tierIndex][section.id!] === null"
                                                                         class="block w-full border border-gray-100 rounded p-1 pl-5 text-xs text-gray-700 placeholder-gray-300 disabled:bg-gray-50 disabled:text-gray-400 focus:ring-0 focus:border-pink-500">
                                                              </div>
                                                              <button type="button" 
-                                                                     (click)="tierLimits[$index][section.id!] = (tierLimits[$index][section.id!] === null ? 0 : null)"
+                                                                     (click)="tierLimits[tierIndex][section.id!] = (tierLimits[tierIndex][section.id!] === null ? 0 : null)"
                                                                      class="p-1 rounded text-[10px] font-bold uppercase border transition-colors"
-                                                                     [class.bg-pink-100]="tierLimits[$index][section.id!] === null"
-                                                                     [class.text-pink-600]="tierLimits[$index][section.id!] === null"
-                                                                     [class.border-pink-200]="tierLimits[$index][section.id!] === null"
-                                                                     [class.bg-gray-50]="tierLimits[$index][section.id!] !== null"
-                                                                     [class.text-gray-400]="tierLimits[$index][section.id!] !== null"
-                                                                     [class.border-gray-200]="tierLimits[$index][section.id!] !== null"
+                                                                     [class.bg-pink-100]="tierLimits[tierIndex][section.id!] === null"
+                                                                     [class.text-pink-600]="tierLimits[tierIndex][section.id!] === null"
+                                                                     [class.border-pink-200]="tierLimits[tierIndex][section.id!] === null"
+                                                                     [class.bg-gray-50]="tierLimits[tierIndex][section.id!] !== null"
+                                                                     [class.text-gray-400]="tierLimits[tierIndex][section.id!] !== null"
+                                                                     [class.border-gray-200]="tierLimits[tierIndex][section.id!] !== null"
                                                                      title="Toggle Unlimited/Max Capacity">
-                                                                     {{ tierLimits[$index][section.id!] === null ? '∞' : 'Lim' }}
+                                                                     {{ tierLimits[tierIndex][section.id!] === null ? '∞' : 'Lim' }}
                                                              </button>
                                                          </div>
                                                      </div>
@@ -252,6 +252,24 @@ import { environment } from '../../../../../environments/environment';
                           </div>
                       </div>
                   }
+              </div>
+
+              <div class="col-span-full bg-indigo-50 p-6 rounded-xl border border-indigo-100 mt-4">
+                  <div class="flex items-center justify-between mb-4">
+                      <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                           <i class="fas fa-map text-xl"></i>
+                        </div>
+                        <div>
+                           <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Show Interactive Map</h3>
+                           <p class="text-xs text-gray-500">Allow users to view and interact with the venue layout map.</p>
+                        </div>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" [(ngModel)]="formData.showMap" name="showMap" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                      </label>
+                  </div>
               </div>
 
               <div class="sm:col-span-3">
@@ -326,22 +344,31 @@ import { environment } from '../../../../../environments/environment';
           @if (showTicketForm) {
             <div class="bg-gray-50 p-6 rounded-xl mb-6 border border-gray-200 shadow-inner">
               <h4 class="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">New Ticket Type</h4>
-              <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 items-end">
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-5 items-end">
                 <div class="space-y-1">
-                   <label class="text-xs font-bold text-gray-500 uppercase">Name</label>
+                   <label class="text-[10px] font-bold text-gray-500 uppercase">Map Section</label>
+                   <select [(ngModel)]="newTicket.sectionId" (change)="onTicketSectionChange()" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm">
+                     <option [ngValue]="null">General</option>
+                     @for (section of selectedLayoutSections(); track section.id) {
+                       <option [value]="section.id">{{ section.name }}</option>
+                     }
+                   </select>
+                </div>
+                <div class="space-y-1">
+                   <label class="text-[10px] font-bold text-gray-500 uppercase">Name</label>
                    <input [(ngModel)]="newTicket.name" placeholder="e.g. VIP" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm">
                 </div>
                 <div class="space-y-1">
-                   <label class="text-xs font-bold text-gray-500 uppercase">Price</label>
+                   <label class="text-[10px] font-bold text-gray-500 uppercase">Price</label>
                    <input [(ngModel)]="newTicket.price" type="number" placeholder="0.00" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm">
                 </div>
                 <div class="space-y-1">
-                   <label class="text-xs font-bold text-gray-500 uppercase">Qty</label>
+                   <label class="text-[10px] font-bold text-gray-500 uppercase">Qty</label>
                    <input [(ngModel)]="newTicket.quantity" type="number" placeholder="100" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 sm:text-sm">
                 </div>
                 <div class="flex items-center gap-2 pb-0.5">
-                  <button (click)="addTicket()" class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 text-sm font-bold uppercase tracking-wide shadow-md">Save</button>
-                  <button (click)="showTicketForm = false" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-bold uppercase tracking-wide">Cancel</button>
+                  <button (click)="addTicket()" class="bg-pink-600 text-white px-3 py-2 rounded-lg hover:bg-pink-700 text-xs font-bold uppercase tracking-wide shadow-md w-full sm:w-auto">Save</button>
+                  <button (click)="showTicketForm = false" class="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 text-xs font-bold uppercase tracking-wide shadow-sm w-full sm:w-auto">Cancel</button>
                 </div>
               </div>
             </div>
@@ -386,8 +413,11 @@ export class EventFormComponent implements OnInit {
     categoryId: null,
     imageUrl: '',
     status: 'published',
-    currency: 'USD'
+    currency: 'USD',
+    showMap: true
   };
+
+  rawEventData: any = null;
 
   // Catalogs
   categories = signal<Category[]>([]);
@@ -412,7 +442,7 @@ export class EventFormComponent implements OnInit {
   // Ticket Management
   tickets = signal<Ticket[]>([]);
   showTicketForm = false;
-  newTicket = { name: '', price: 0, quantity: 100 };
+  newTicket: any = { name: '', price: 0, quantity: 100, sectionId: null };
 
   previewImage: string | null = null;
 
@@ -428,7 +458,18 @@ export class EventFormComponent implements OnInit {
 
   ngOnInit() {
     this.categoryService.getCategories().subscribe(data => this.categories.set(data));
-    this.venueService.getVenues().subscribe(data => this.venues.set(data));
+    this.venueService.getVenues().subscribe(data => {
+      this.venues.set(data);
+      if (this.isEditMode && this.formData.venueId) {
+        this.updateAvailableLayouts(this.formData.venueId);
+        if (this.formData.layoutId) {
+          this.onLayoutChange();
+          if (this.rawEventData) {
+            this.populatePricingFromEvent();
+          }
+        }
+      }
+    });
 
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -444,11 +485,18 @@ export class EventFormComponent implements OnInit {
     this.eventService.getEventById(id).subscribe(event => {
       this.formData = { ...event };
 
+      this.rawEventData = event;
       if (event.Venue) {
         this.formData.venueId = event.Venue.id;
         delete this.formData.Venue;
-        // Populate layouts for existing event
-        this.updateAvailableLayouts(this.formData.venueId);
+        // Populate layouts if venues are already loaded
+        if (this.venues().length > 0) {
+          this.updateAvailableLayouts(this.formData.venueId);
+          if (this.formData.layoutId) {
+            this.onLayoutChange();
+            this.populatePricingFromEvent();
+          }
+        }
       }
       if (event.Category) {
         this.formData.categoryId = event.Category.id;
@@ -574,6 +622,56 @@ export class EventFormComponent implements OnInit {
     }
   }
 
+  populatePricingFromEvent() {
+    if (!this.rawEventData) return;
+    const event = this.rawEventData;
+
+    if (event.tiers && event.tiers.length > 0) {
+      this.enableTiers = true;
+      this.tiers = event.tiers.map((t: any) => ({
+        id: t.id,
+        name: t.name,
+        startDate: t.startDate ? new Date(t.startDate).toISOString().slice(0, 16) : '',
+        endDate: t.endDate ? new Date(t.endDate).toISOString().slice(0, 16) : ''
+      }));
+
+      this.tierPrices = {};
+      this.tierLimits = {};
+
+      this.tiers.forEach((tier, index) => {
+        this.tierPrices[index] = {};
+        this.tierLimits[index] = {};
+
+        // default
+        this.selectedLayoutSections().forEach(s => {
+          this.tierPrices[index][s.id!] = 0;
+          this.tierLimits[index][s.id!] = null;
+        });
+
+        if (event.Tickets) {
+          const tierTickets = event.Tickets.filter((t: any) => t.tierId === tier.id);
+          tierTickets.forEach((ticket: any) => {
+            this.tierPrices[index][ticket.sectionId!] = ticket.price;
+            const section = this.selectedLayoutSections().find(s => s.id === ticket.sectionId);
+            if (section && ticket.quantity < section.capacity) {
+              this.tierLimits[index][ticket.sectionId!] = ticket.quantity;
+            } else {
+              this.tierLimits[index][ticket.sectionId!] = null;
+            }
+          });
+        }
+      });
+    } else if (event.Tickets && event.Tickets.length > 0) {
+      this.enableTiers = false;
+      if (!this.sectionPrices) this.sectionPrices = {};
+      event.Tickets.forEach((ticket: any) => {
+        if (ticket.sectionId && !ticket.tierId) {
+          this.sectionPrices[ticket.sectionId] = ticket.price;
+        }
+      });
+    }
+  }
+
   removeImage() {
     this.formData.imageUrl = '';
     this.previewImage = null;
@@ -588,12 +686,32 @@ export class EventFormComponent implements OnInit {
   }
 
   onSubmit() {
+    // Validations
+    if (!this.formData.title || !this.formData.title.trim()) {
+      alert('Event Title is required.');
+      return;
+    }
+
+    if (!this.formData.date) {
+      alert('You must enter a valid Date & Time for this event.');
+      return;
+    }
+
+    if (!this.formData.venueId) {
+      alert('You must select a Venue for this event.');
+      return;
+    }
+
+    if (!this.formData.layoutId) {
+      alert('You must select a Layout to configure spaces and tickets.');
+      return;
+    }
+
     // Construct Payload
     const payload: any = { ...this.formData };
 
-    // Add ticket configs if creating and using sections
-    // Add ticket configs if creating and using sections
-    if (!this.isEditMode && this.formData.layoutId && this.selectedLayoutSections().length > 0) {
+    // Add ticket configs if using sections (both Create and Edit mode)
+    if (this.formData.layoutId && this.selectedLayoutSections().length > 0) {
 
       if (this.enableTiers) {
         payload.tiers = this.tiers.map((tier, index) => {
@@ -641,15 +759,30 @@ export class EventFormComponent implements OnInit {
   addTicket() {
     if (!this.eventId) return;
 
+    if (!this.newTicket.name || !this.newTicket.name.trim()) {
+      alert('Please enter a ticket name');
+      return;
+    }
+
     const ticketPayload = { ...this.newTicket, eventId: this.eventId };
     this.ticketService.createTicket(ticketPayload).subscribe({
       next: () => {
         this.showTicketForm = false;
-        this.newTicket = { name: '', price: 0, quantity: 100 };
+        this.newTicket = { name: '', price: 0, quantity: 100, sectionId: null };
         this.loadTickets(this.eventId!);
       },
       error: (err) => alert('Failed to create ticket: ' + err.error?.message)
     });
+  }
+
+  onTicketSectionChange() {
+    if (this.newTicket.sectionId) {
+      const section = this.selectedLayoutSections().find(s => s.id == this.newTicket.sectionId);
+      if (section) {
+        this.newTicket.name = section.name;
+        this.newTicket.quantity = section.capacity;
+      }
+    }
   }
 
   deleteTicket(ticketId: number) {

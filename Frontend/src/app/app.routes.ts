@@ -4,12 +4,21 @@ import { HomeComponent } from './features/public/pages/home/home.component';
 import { LoginComponent } from './features/public/pages/login/login.component';
 import { RegisterComponent } from './features/public/pages/register/register.component';
 import { adminGuard, authGuard } from './core/guards/auth.guard';
+import { setupGuard, alreadyConfiguredGuard } from './core/guards/setup.guard';
 
 export const routes: Routes = [
+    // Setup Route
+    {
+        path: 'setup',
+        loadComponent: () => import('./features/setup/pages/setup-wizard/setup-wizard.component').then(m => m.SetupWizardComponent),
+        canActivate: [setupGuard]
+    },
+
     // Public Routes
     {
         path: '',
         component: PublicLayoutComponent,
+        canActivate: [alreadyConfiguredGuard],
         children: [
             { path: '', component: HomeComponent },
             {
@@ -22,6 +31,14 @@ export const routes: Routes = [
             },
             { path: 'auth/login', component: LoginComponent },
             { path: 'auth/register', component: RegisterComponent },
+            {
+                path: 'forgot-password',
+                loadComponent: () => import('./features/public/pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+            },
+            {
+                path: 'reset-password',
+                loadComponent: () => import('./features/public/pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+            },
             {
                 path: 'checkout',
                 loadComponent: () => import('./features/public/pages/checkout/checkout.component').then(m => m.CheckoutComponent)
@@ -84,8 +101,24 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/admin/pages/users-list/users-list.component').then(m => m.UsersListComponent)
             },
             {
+                path: 'users/new',
+                loadComponent: () => import('./features/admin/pages/user-form/user-form.component').then(m => m.UserFormComponent)
+            },
+            {
+                path: 'users/edit/:id',
+                loadComponent: () => import('./features/admin/pages/user-form/user-form.component').then(m => m.UserFormComponent)
+            },
+            {
                 path: 'settings',
                 loadComponent: () => import('./features/admin/pages/settings/settings.component').then(m => m.SettingsComponent)
+            },
+            {
+                path: 'settings/logs',
+                loadComponent: () => import('./features/admin/pages/email-logs/email-logs.component').then(m => m.EmailLogsComponent)
+            },
+            {
+                path: 'settings/templates',
+                loadComponent: () => import('./features/admin/pages/email-templates/email-templates.component').then(m => m.EmailTemplatesComponent)
             },
             {
                 path: 'promos',
@@ -110,6 +143,10 @@ export const routes: Routes = [
             {
                 path: 'venues/edit/:id',
                 loadComponent: () => import('./features/admin/pages/venue-form/venue-form.component').then(m => m.VenueFormComponent)
+            },
+            {
+                path: 'profile',
+                loadComponent: () => import('./features/admin/pages/admin-profile/admin-profile.component').then(m => m.AdminProfileComponent)
             },
         ]
     },

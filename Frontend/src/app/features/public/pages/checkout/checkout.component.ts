@@ -10,7 +10,7 @@ import { PromoService } from '../../../../core/services/promo.service';
 @Component({
    selector: 'app-checkout',
    standalone: true,
-   imports: [CommonModule, FormsModule, TranslateModule, RouterLink],
+   imports: [CommonModule, FormsModule, TranslateModule],
    template: `
     <!-- Top Bar with Timer -->
     <div class="bg-indigo-900 text-white py-3 px-4 sticky top-0 z-50 shadow-md">
@@ -96,6 +96,15 @@ import { PromoService } from '../../../../core/services/promo.service';
                              <button (click)="login()" class="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition font-medium text-gray-700">
                                 <i class="fas fa-envelope text-gray-500 mr-2"></i> Sign In with Email
                              </button>
+                          </div>
+
+                          <!-- Register Section -->
+                          <div class="mt-8 pt-6 border-t border-gray-100">
+                              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'CHECKOUT.REGISTER.TITLE' | translate }}</h3>
+                              <p class="text-gray-500 mb-4 text-sm">{{ 'CHECKOUT.REGISTER.DESC' | translate }}</p>
+                              <button (click)="register()" class="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition">
+                                 {{ 'CHECKOUT.REGISTER.BUTTON' | translate }}
+                              </button>
                           </div>
                        </div>
                     </div>
@@ -345,6 +354,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
    login() {
       this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/checkout' } });
+   }
+
+   register() {
+      this.router.navigate(['/auth/register'], { queryParams: { returnUrl: '/checkout' } });
    }
 
    nextStep() {

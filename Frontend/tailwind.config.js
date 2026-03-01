@@ -9,6 +9,8 @@ module.exports = {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
+        primary: '#6337FF',
+        secondary: '#E6FF4B',
         indigo: {
           50: '#f0f3ff',
           100: '#e0e7ff',

@@ -36,7 +36,7 @@ import { environment } from '../../../../../environments/environment';
                           <h2 class="text-xl font-bold text-gray-900 truncate">{{ authService.currentUserSig()?.name }}</h2>
                           <p class="text-sm text-gray-500 truncate">{{ authService.currentUserSig()?.email }}</p>
                           <p *ngIf="authService.currentUserSig()?.role === 'user'" class="text-xs text-gray-400 mt-1">
-                             {{ $any(authService.currentUserSig())?.phoneNumber || 'No phone' }}
+                             {{ $any(authService.currentUserSig())?.phoneNumber || 'No phone' }} • <span class="uppercase">{{ $any(authService.currentUserSig())?.language || 'es' }}</span>
                           </p>
                        </div>
                     </div>
@@ -63,6 +63,13 @@ import { environment } from '../../../../../environments/environment';
                         <div>
                             <label class="block text-xs text-gray-500">Phone</label>
                             <input [(ngModel)]="editPhone" name="editPhone" class="w-full p-2 border rounded">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500">Language</label>
+                            <select [(ngModel)]="editLanguage" name="editLanguage" class="w-full p-2 border rounded">
+                                <option value="es">Español</option>
+                                <option value="en">English</option>
+                            </select>
                         </div>
                         <div class="flex space-x-2 pt-2">
                             <button type="submit" class="flex-1 bg-pink-600 text-white py-2 rounded hover:bg-pink-700">Save</button>
@@ -159,6 +166,7 @@ export class ProfileComponent implements OnInit {
    editName = '';
    editEmail = '';
    editPhone = '';
+   editLanguage = 'es';
 
    constructor(
       private orderService: OrderService,
@@ -189,6 +197,7 @@ export class ProfileComponent implements OnInit {
          this.editEmail = user.email;
          // We need to cast or extend interface to include phoneNumber if not in User type yet
          this.editPhone = (user as any).phoneNumber || '';
+         this.editLanguage = (user as any).language || 'es';
          this.isEditing.set(true);
       }
    }
@@ -201,7 +210,8 @@ export class ProfileComponent implements OnInit {
       this.authService.updateProfile({
          name: this.editName,
          email: this.editEmail,
-         phoneNumber: this.editPhone
+         phoneNumber: this.editPhone,
+         language: this.editLanguage
       }).subscribe({
          next: () => {
             this.isEditing.set(false);

@@ -18,11 +18,27 @@ export class OrderService {
     private _cartItems: { ticketId: number; name: string; price: number; quantity: number }[] = [];
     private _currency = 'USD';
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {
+        // Hydrate from storage if available
+        const storedCart = localStorage.getItem('cartItems');
+        if (storedCart) {
+            try {
+                this._cartItems = JSON.parse(storedCart);
+            } catch (e) {
+                console.error('Failed to parse cart items', e);
+            }
+        }
+
+        const storedCurrency = localStorage.getItem('cartCurrency');
+        if (storedCurrency) this._currency = storedCurrency;
+    }
 
     setCart(items: { ticketId: number; name: string; price: number; quantity: number }[], currency: string = 'USD') {
         this._cartItems = items;
         this._currency = currency;
+        // Persist
+        localStorage.setItem('cartItems', JSON.stringify(items));
+        localStorage.setItem('cartCurrency', currency);
     }
 
     getCart() {
@@ -53,6 +69,17 @@ export class OrderService {
         const token = localStorage.getItem('token');
         const headers = { Authorization: `Bearer ${token}` };
         return this.http.get<OrderResponse>(this.apiUrl, { headers, params });
+    }
+
+    exportOrders(params: any = {}): Observable<Blob> {
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        return this.http.get(`${this.apiUrl}/export`, {
+            headers,
+            params: { ...params, timezone },
+            responseType: 'blob'
+        });
     }
 }
 

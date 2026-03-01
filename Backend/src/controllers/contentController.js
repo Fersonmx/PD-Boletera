@@ -51,7 +51,16 @@ exports.deleteHeroSlide = async (req, res) => {
 exports.getPageBySlug = async (req, res) => {
     try {
         const { slug } = req.params;
-        const page = await Page.findOne({ where: { slug, isActive: true } });
+        const lang = req.query.lang || 'es';
+        console.log(`[ContentController] Fetching page: ${slug}, lang: ${lang}`); // DEBUG
+
+        let page = await Page.findOne({ where: { slug, language: lang, isActive: true } });
+
+        // Fallback: if not found in requested lang, try default 'es'
+        if (!page && lang !== 'es') {
+            page = await Page.findOne({ where: { slug, language: 'es', isActive: true } });
+        }
+
         if (!page) return res.status(404).json({ message: 'Page not found' });
         res.json(page);
     } catch (error) {

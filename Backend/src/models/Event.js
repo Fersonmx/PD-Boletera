@@ -48,6 +48,11 @@ const Event = sequelize.define('Event', {
     dynamicQrWindow: {
         type: DataTypes.INTEGER, // Minutes before event to enable QR
         defaultValue: 120
+    },
+    // Map Settings
+    showMap: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
     }
 });
 

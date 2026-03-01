@@ -58,26 +58,43 @@ import { CommonModule } from '@angular/common';
             <li>
                 <a routerLink="/admin/promos" routerLinkActive="bg-pink-50 text-pink-600 shadow-sm" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-pink-600 transition-colors group">
                   <i class="fas fa-tags w-6 text-center text-lg"></i>
-                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">Promo Codes</span>
+                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">{{ 'ADMIN.NAV.PROMOS' | translate }}</span>
                 </a>
             </li>
             <li>
                 <a routerLink="/admin/slider" routerLinkActive="bg-pink-50 text-pink-600 shadow-sm" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-pink-600 transition-colors group">
                   <i class="fas fa-images w-6 text-center text-lg"></i>
-                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">Hero Slider</span>
+                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">{{ 'ADMIN.NAV.SLIDER' | translate }}</span>
                 </a>
             </li>
             <li>
                 <a routerLink="/admin/pages" routerLinkActive="bg-pink-50 text-pink-600 shadow-sm" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-pink-600 transition-colors group">
                   <i class="fas fa-file-alt w-6 text-center text-lg"></i>
-                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">Content Pages</span>
+                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">{{ 'ADMIN.NAV.PAGES' | translate }}</span>
                 </a>
             </li>
             <li>
-              <a routerLink="/admin/settings" routerLinkActive="bg-pink-50 text-pink-600 shadow-sm" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-pink-600 transition-colors group">
-                <i class="fas fa-cog w-6 text-center text-lg"></i>
-                <span class="ml-3 font-bold text-sm uppercase tracking-wide">{{ 'ADMIN.NAV.SETTINGS' | translate }}</span>
+              <a routerLink="/admin/profile" routerLinkActive="bg-pink-50 text-pink-600 shadow-sm" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-pink-600 transition-colors group">
+                <i class="fas fa-user-circle w-6 text-center text-lg"></i>
+                <span class="ml-3 font-bold text-sm uppercase tracking-wide">{{ 'ADMIN.NAV.PROFILE' | translate }}</span>
               </a>
+            </li>
+            <li>
+              <div class="px-3 pt-6 pb-2">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-2 mb-2">Sistema</p>
+                <a routerLink="/admin/settings" routerLinkActive="bg-pink-50 text-pink-600 shadow-sm" [routerLinkActiveOptions]="{exact: true}" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-pink-600 transition-colors group mb-1">
+                  <i class="fas fa-cog w-6 text-center text-lg"></i>
+                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">{{ 'ADMIN.NAV.SETTINGS' | translate }}</span>
+                </a>
+                <a routerLink="/admin/settings/templates" routerLinkActive="bg-pink-50 text-pink-600 shadow-sm" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-pink-600 transition-colors group mb-1">
+                  <i class="fas fa-envelope-open-text w-6 text-center text-lg"></i>
+                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">Plantillas Correo</span>
+                </a>
+                <a routerLink="/admin/settings/logs" routerLinkActive="bg-pink-50 text-pink-600 shadow-sm" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-pink-600 transition-colors group">
+                  <i class="fas fa-list-alt w-6 text-center text-lg"></i>
+                  <span class="ml-3 font-bold text-sm uppercase tracking-wide">Email Logs</span>
+                </a>
+              </div>
             </li>
           </ul>
 

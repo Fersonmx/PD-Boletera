@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Setting = require('../models/Setting');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const emailService = require('../services/emailService');
 
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET, {
@@ -54,6 +56,9 @@ exports.register = async (req, res) => {
             twoFactorExpires
         });
 
+        // Fire and forget welcome email
+        emailService.sendWelcomeEmail(user.email, user.name, user.language).catch(e => console.error('[Welcome Email Error]', e));
+
         if (is2FAEnabled) {
             return res.status(200).json({
                 message: 'Verification code sent',
@@ -71,7 +76,8 @@ exports.register = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                language: user.language
             }
         });
 
@@ -111,7 +117,8 @@ exports.verifySms = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                language: user.language
             }
         });
 
@@ -149,7 +156,8 @@ exports.login = async (req, res) => {
                     id: user.id,
                     name: user.name,
                     email: user.email,
-                    role: user.role
+                    role: user.role,
+                    language: user.language
                 }
             });
         } else {
@@ -206,6 +214,9 @@ exports.googleAuth = async (req, res) => {
                 isActive: true, // Auto-activate google users
                 password: null // No password
             });
+
+            // Fire and forget welcome email for newly created user
+            emailService.sendWelcomeEmail(user.email, user.name, user.language).catch(e => console.error('[Welcome Email Error]', e));
         }
 
         const jwtToken = generateToken(user.id, user.role);
@@ -217,10 +228,10 @@ exports.googleAuth = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                language: user.language
             }
         });
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -238,13 +249,15 @@ exports.updateProfile = async (req, res) => {
         const { name, email, phoneNumber } = req.body;
 
         if (email && email !== user.email) {
+            // Check if email taken by another user
             const exists = await User.findOne({ where: { email } });
             if (exists) return res.status(400).json({ message: 'Email already in use' });
         }
 
         user.name = name || user.name;
         user.email = email || user.email;
-        user.phoneNumber = phoneNumber || user.phoneNumber;
+        if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
+        if (req.body.language) user.language = req.body.language;
 
         await user.save();
 
@@ -255,12 +268,111 @@ exports.updateProfile = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                phoneNumber: user.phoneNumber
+                phoneNumber: user.phoneNumber,
+                language: user.language
             }
         });
 
     } catch (error) {
         console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.updatePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findByPk(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check current password match - verify matchPassword returns promise
+        const isMatch = await user.matchPassword(currentPassword);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Incorrect current password' });
+        }
+
+        // Update password - hook will hash it
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: 'Password updated successfully' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ where: { email } });
+
+        if (!user) {
+            // Return success even if not found to prevent email enumeration
+            return res.json({ message: 'If that email is in our database, we will send a password recovery link to it' });
+        }
+
+        // Generate token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+
+        // Hash token before storing it
+        user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+
+        await user.save({ validate: false }); // Skip validation just in case
+
+        try {
+            await emailService.sendPasswordRecovery(user.email, resetToken, user.language);
+            res.json({ message: 'If that email is in our database, we will send a password recovery link to it' });
+        } catch (error) {
+            console.error('Email could not be sent', error);
+            user.resetPasswordToken = null;
+            user.resetPasswordExpires = null;
+            await user.save({ validate: false });
+            return res.status(500).json({ message: 'Email could not be sent' });
+        }
+    } catch (error) {
+        console.error('forgotPassword error:', error);
+        console.error('Error Details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        res.status(500).json({ message: 'Server error', details: error.message });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { token, password } = req.body;
+
+        // Hash token to compare with database
+        const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        const user = await User.findOne({
+            where: {
+                resetPasswordToken,
+                resetPasswordExpires: {
+                    [require('sequelize').Op.gt]: Date.now()
+                }
+            }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired password reset token' });
+        }
+
+        // Set new password
+        user.password = password; // The beforeUpdate hook will hash it
+        user.resetPasswordToken = null;
+        user.resetPasswordExpires = null;
+
+        await user.save();
+
+        res.json({ message: 'Password has been successfully reset' });
+
+    } catch (error) {
+        console.error('resetPassword error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };

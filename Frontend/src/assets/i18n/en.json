@@ -15,6 +15,9 @@
         "SEARCH_BTN": "SEARCH",
         "NO_EVENTS": "No events found",
         "FIND_TICKETS": "FIND TICKETS",
+        "HERO": {
+            "CTA": "FIND TICKETS"
+        },
         "FILTERS": {
             "ALL": "ALL",
             "TODAY": "TODAY",
@@ -39,8 +42,166 @@
             "VENUES": "Venues",
             "EVENTS": "Events",
             "ORDERS": "Orders",
-            "CUSTOMERS": "Customers",
-            "SETTINGS": "Settings"
+            "CUSTOMERS": "Users",
+            "PROFILE": "My Profile",
+            "SETTINGS": "Settings",
+            "PROMOS": "Promo Codes",
+            "SLIDER": "Hero Slider",
+            "PAGES": "Content Pages"
+        },
+        "EVENTS_LIST": {
+            "TITLE": "Events Management",
+            "SEARCH": "Search by title or description...",
+            "BTN_CREATE": "Create Event",
+            "BTN_CATS": "Categories",
+            "TH_EVENT": "Event",
+            "TH_DATE": "Date",
+            "TH_VENUE": "Venue",
+            "TH_STATUS": "Status",
+            "TH_ACTION": "Action",
+            "EMPTY": "No events found.",
+            "BTN_EDIT": "Edit",
+            "BTN_DELETE": "Delete",
+            "BTN_PREV": "Previous",
+            "BTN_NEXT": "Next",
+            "MODAL_TITLE": "Manage Categories",
+            "BTN_ADD": "Add",
+            "BTN_CLOSE": "Close",
+            "PG_PAGE": "Page",
+            "PG_OF": "of",
+            "PG_TOTAL": "Total"
+        },
+        "VENUES_LIST": {
+            "TITLE": "Venues Management",
+            "SEARCH": "Search venues...",
+            "BTN_CREATE": "Create Venue",
+            "TH_VENUE": "Venue",
+            "TH_CITY": "City",
+            "TH_CAPACITY": "Capacity",
+            "TH_STATUS": "Status",
+            "TH_ACTION": "Action",
+            "EMPTY": "No venues found.",
+            "BTN_EDIT": "Edit",
+            "BTN_DELETE": "Delete"
+        },
+        "ORDERS_LIST": {
+            "TITLE": "Orders Management",
+            "SEARCH": "Search by order ID or email...",
+            "BTN_EXPORT": "Export XLSX",
+            "TH_ORDER": "Order",
+            "TH_CUSTOMER": "Customer",
+            "TH_DATE": "Date",
+            "TH_TOTAL": "Total",
+            "TH_STATUS": "Status",
+            "TH_ACTION": "Action",
+            "EMPTY": "No orders found.",
+            "BTN_VIEW": "View Details"
+        },
+        "USERS_LIST": {
+            "TITLE": "Users Management",
+            "SEARCH": "Search users...",
+            "BTN_CREATE": "Create User",
+            "TH_NAME": "Name",
+            "TH_EMAIL": "Email",
+            "TH_ROLE": "Role",
+            "TH_STATUS": "Status",
+            "TH_ACTION": "Action",
+            "EMPTY": "No users found.",
+            "BTN_EDIT": "Edit",
+            "BTN_DELETE": "Delete"
+        },
+        "COMMON": {
+            "ACTIVE": "Active",
+            "INACTIVE": "Inactive",
+            "DRAFT": "Draft",
+            "PUBLISHED": "Published",
+            "COMPLETED": "Completed",
+            "CANCELLED": "Cancelled",
+            "EXPIRED": "Expired"
+        },
+        "DASHBOARD": {
+            "TOTAL_REVENUE": "Total Revenue",
+            "TOTAL_TICKETS": "Total Tickets Sold",
+            "STABLE": "Stable",
+            "ACTIVE_EVENTS": "Active Events"
+        },
+        "SETTINGS": {
+            "TITLE": "System Settings",
+            "DESC": "Manage gateway integrations, UI themes, and fees.",
+            "TAB_GENERAL": "General",
+            "TAB_PAYMENT": "Payment",
+            "TAB_NOTIFICATION": "Notifications",
+            "SAVE": "Save Settings",
+            "AUTH_TITLE": "Authentication & Security",
+            "2FA_LABEL": "Registration 2FA",
+            "2FA_DESC": "Enable SMS Two-Factor Authentication for new user registrations",
+            "SMTP": {
+                "TITLE": "Email Configuration (SMTP)",
+                "DESC": "Configure the SMTP parameters used for sending system emails like contact forms and automated alerts.",
+                "HOST": "SMTP Host",
+                "PORT": "SMTP Port",
+                "USER": "SMTP User / Email",
+                "PASS": "SMTP Password or App Key",
+                "FROM": "From Email & Name",
+                "TEST_EMAIL": "Destination Test Email",
+                "BTN_TEST": "Send Test Email",
+                "TESTING": "Testing...",
+                "BTN_SAVE": "Save Configuration"
+            },
+            "WELCOME": {
+                "TITLE": "Welcome Email Template",
+                "DESC": "Configure the automated email sent to new registered users.",
+                "SUBJECT": "Email Subject",
+                "BODY": "Email Body (Basic HTML supported)",
+                "VARIABLES_TITLE": "Available Variables",
+                "VAR_NAME": "User's Name",
+                "VAR_EMAIL": "User's Registration Email",
+                "BTN_SAVE": "Save Template"
+            },
+            "EMAIL_LOGS": {
+                "TITLE": "Email Delivery Logs",
+                "DESC": "Review the latest sent or failed emails to debug server or SMTP configuration issues.",
+                "TH_DATE": "Date",
+                "TH_TYPE": "Type",
+                "TH_TO": "Recipient",
+                "TH_SUBJECT": "Subject",
+                "TH_STATUS": "Status",
+                "TH_ERROR": "Error (If any)",
+                "REFRESH": "Refresh Logs",
+                "EMPTY": "No email logs available yet.",
+                "FILTER_ALL_TYPES": "All Types",
+                "FILTER_ALL_STATUS": "Any Status"
+            }
+        },
+        "PROFILE": {
+            "TITLE": "Admin Profile",
+            "DESC": "Update your personal info and password.",
+            "TAB_INFO": "Basic Information",
+            "TAB_SECURITY": "Security Settings",
+            "SAVE": "Save Profile",
+            "LOGOUT": "Logout"
+        },
+        "PROMOS": {
+            "TITLE": "Promo Codes",
+            "DESC": "Manage discounts and coupons",
+            "NEW": "New Code",
+            "CREATE": "Create Promo Code",
+            "CODE": "Code",
+            "TYPE": "Type",
+            "VAL": "Value",
+            "LIM": "Limit (Optional)",
+            "CANCEL": "Cancel",
+            "SAVE": "Save",
+            "TH_CODE": "Code",
+            "TH_DISC": "Discount",
+            "TH_USAGE": "Usage",
+            "TH_STATUS": "Status",
+            "TH_ACT": "Actions",
+            "EMPTY": "No promo codes found",
+            "FIXED": "Fixed Amount",
+            "PERC": "Percentage",
+            "ACTIVE": "Active",
+            "DELETE": "Delete"
         }
     },
     "FOOTER": {
@@ -66,7 +227,8 @@
         "PASSWORD": "Password",
         "BUTTON": "Sign In",
         "NO_ACCOUNT": "Don't have an account?",
-        "REGISTER_LINK": "Register now"
+        "REGISTER_LINK": "Register now",
+        "FORGOT_PASSWORD": "Forgot password?"
     },
     "REGISTER_PAGE": {
         "TITLE": "Create Account",
@@ -139,6 +301,11 @@
             "QUANTITY": "Quantity",
             "TOTAL": "Total",
             "PLACE_ORDER": "Place Order"
+        },
+        "REGISTER": {
+            "TITLE": "New here?",
+            "DESC": "Create an account to save your tickets and track your order.",
+            "BUTTON": "Create Account"
         }
     },
     "PROFILE": {

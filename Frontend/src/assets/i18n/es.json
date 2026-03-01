@@ -15,6 +15,9 @@
         "SEARCH_BTN": "BUSCAR",
         "NO_EVENTS": "No se encontraron eventos",
         "FIND_TICKETS": "BUSCAR BOLETOS",
+        "HERO": {
+            "CTA": "BUSCAR BOLETOS"
+        },
         "FILTERS": {
             "ALL": "TODOS",
             "TODAY": "HOY",
@@ -39,8 +42,166 @@
             "VENUES": "Recintos",
             "EVENTS": "Eventos",
             "ORDERS": "Pedidos",
-            "CUSTOMERS": "Clientes",
-            "SETTINGS": "Ajustes"
+            "CUSTOMERS": "Usuarios",
+            "PROFILE": "Mi Perfil",
+            "SETTINGS": "Ajustes",
+            "PROMOS": "Códigos Promo",
+            "SLIDER": "Hero Slider",
+            "PAGES": "Páginas de Contenido"
+        },
+        "EVENTS_LIST": {
+            "TITLE": "Gestión de Eventos",
+            "SEARCH": "Buscar por título o descripción...",
+            "BTN_CREATE": "Crear Evento",
+            "BTN_CATS": "Categorías",
+            "TH_EVENT": "Evento",
+            "TH_DATE": "Fecha",
+            "TH_VENUE": "Recinto",
+            "TH_STATUS": "Estado",
+            "TH_ACTION": "Acción",
+            "EMPTY": "No se encontraron eventos.",
+            "BTN_EDIT": "Editar",
+            "BTN_DELETE": "Eliminar",
+            "BTN_PREV": "Anterior",
+            "BTN_NEXT": "Siguiente",
+            "MODAL_TITLE": "Gestionar Categorías",
+            "BTN_ADD": "Añadir",
+            "BTN_CLOSE": "Cerrar",
+            "PG_PAGE": "Página",
+            "PG_OF": "de",
+            "PG_TOTAL": "Total"
+        },
+        "VENUES_LIST": {
+            "TITLE": "Gestión de Recintos",
+            "SEARCH": "Buscar recintos...",
+            "BTN_CREATE": "Crear Recinto",
+            "TH_VENUE": "Recinto",
+            "TH_CITY": "Ciudad",
+            "TH_CAPACITY": "Capacidad",
+            "TH_STATUS": "Estado",
+            "TH_ACTION": "Acción",
+            "EMPTY": "No se encontraron recintos.",
+            "BTN_EDIT": "Editar",
+            "BTN_DELETE": "Eliminar"
+        },
+        "ORDERS_LIST": {
+            "TITLE": "Gestión de Pedidos",
+            "SEARCH": "Buscar por ID o correo...",
+            "BTN_EXPORT": "Exportar XLSX",
+            "TH_ORDER": "Pedido",
+            "TH_CUSTOMER": "Cliente",
+            "TH_DATE": "Fecha",
+            "TH_TOTAL": "Total",
+            "TH_STATUS": "Estado",
+            "TH_ACTION": "Acción",
+            "EMPTY": "No se encontraron pedidos.",
+            "BTN_VIEW": "Ver Detalles"
+        },
+        "USERS_LIST": {
+            "TITLE": "Gestión de Usuarios",
+            "SEARCH": "Buscar usuarios...",
+            "BTN_CREATE": "Crear Usuario",
+            "TH_NAME": "Nombre",
+            "TH_EMAIL": "Correo",
+            "TH_ROLE": "Rol",
+            "TH_STATUS": "Estado",
+            "TH_ACTION": "Acción",
+            "EMPTY": "No se encontraron usuarios.",
+            "BTN_EDIT": "Editar",
+            "BTN_DELETE": "Eliminar"
+        },
+        "COMMON": {
+            "ACTIVE": "Activo",
+            "INACTIVE": "Inactivo",
+            "DRAFT": "Borrador",
+            "PUBLISHED": "Publicado",
+            "COMPLETED": "Completado",
+            "CANCELLED": "Cancelado",
+            "EXPIRED": "Expirado"
+        },
+        "DASHBOARD": {
+            "TOTAL_REVENUE": "Ingresos Totales",
+            "TOTAL_TICKETS": "Boletos Vendidos",
+            "STABLE": "Estable",
+            "ACTIVE_EVENTS": "Eventos Activos"
+        },
+        "SETTINGS": {
+            "TITLE": "Ajustes del Sistema",
+            "DESC": "Gestiona integraciones, temas y cargos.",
+            "TAB_GENERAL": "General",
+            "TAB_PAYMENT": "Pago",
+            "TAB_NOTIFICATION": "Notificaciones",
+            "SAVE": "Guardar Ajustes",
+            "AUTH_TITLE": "Autenticación y Seguridad",
+            "2FA_LABEL": "2FA en Registro",
+            "2FA_DESC": "Habilitar autenticación de dos factores vía SMS para nuevos registros",
+            "SMTP": {
+                "TITLE": "Configuración de Correo (SMTP)",
+                "DESC": "Configura los parámetros SMTP usados para correos del sistema como formularios de contacto y alertas.",
+                "HOST": "Servidor SMTP (Host)",
+                "PORT": "Puerto SMTP",
+                "USER": "Usuario / Correo SMTP",
+                "PASS": "Contraseña o App Key",
+                "FROM": "Remitente (Email & Nombre)",
+                "TEST_EMAIL": "Correo de Prueba Destino",
+                "BTN_TEST": "Enviar Correo de Prueba",
+                "TESTING": "Probando...",
+                "BTN_SAVE": "Guardar Configuración"
+            },
+            "WELCOME": {
+                "TITLE": "Plantilla de Bienvenida",
+                "DESC": "Configura el correo que se envía automáticamente a los nuevos usuarios registrados.",
+                "SUBJECT": "Asunto del Correo",
+                "BODY": "Cuerpo del Correo (Soporta HTML básico)",
+                "VARIABLES_TITLE": "Variables Disponibles",
+                "VAR_NAME": "Nombre del Usuario",
+                "VAR_EMAIL": "Correo de Registro del Usuario",
+                "BTN_SAVE": "Guardar Plantilla"
+            },
+            "EMAIL_LOGS": {
+                "TITLE": "Registro de Correos (Logs)",
+                "DESC": "Revisa los últimos correos enviados o fallidos debido a problemas de servidor o configuración SMTP.",
+                "TH_DATE": "Fecha",
+                "TH_TYPE": "Tipo",
+                "TH_TO": "Destinatario",
+                "TH_SUBJECT": "Asunto",
+                "TH_STATUS": "Estado",
+                "TH_ERROR": "Error (Si aplica)",
+                "REFRESH": "Refrescar Logs",
+                "EMPTY": "No hay registros de correo aún.",
+                "FILTER_ALL_TYPES": "Todos los Tipos",
+                "FILTER_ALL_STATUS": "Cualquier Estado"
+            }
+        },
+        "PROFILE": {
+            "TITLE": "Perfil de Admin",
+            "DESC": "Actualiza tu información y contraseña.",
+            "TAB_INFO": "Información Básica",
+            "TAB_SECURITY": "Seguridad",
+            "SAVE": "Guardar Perfil",
+            "LOGOUT": "Cerrar Sesión"
+        },
+        "PROMOS": {
+            "TITLE": "Códigos Promocionales",
+            "DESC": "Gestiona descuentos y cupones",
+            "NEW": "Nuevo Código",
+            "CREATE": "Crear Código",
+            "CODE": "Código",
+            "TYPE": "Tipo",
+            "VAL": "Valor",
+            "LIM": "Límite (Opcional)",
+            "CANCEL": "Cancelar",
+            "SAVE": "Guardar",
+            "TH_CODE": "Código",
+            "TH_DISC": "Descuento",
+            "TH_USAGE": "Uso",
+            "TH_STATUS": "Estado",
+            "TH_ACT": "Acciones",
+            "EMPTY": "No se encontraron códigos",
+            "FIXED": "Monto Fijo",
+            "PERC": "Porcentaje",
+            "ACTIVE": "Activo",
+            "DELETE": "Eliminar"
         }
     },
     "FOOTER": {
@@ -66,7 +227,8 @@
         "PASSWORD": "Contraseña",
         "BUTTON": "Iniciar Sesión",
         "NO_ACCOUNT": "¿No tienes cuenta?",
-        "REGISTER_LINK": "Regístrate ahora"
+        "REGISTER_LINK": "Regístrate ahora",
+        "FORGOT_PASSWORD": "¿Olvidaste tu contraseña?"
     },
     "REGISTER_PAGE": {
         "TITLE": "Crear Cuenta",
@@ -139,6 +301,11 @@
             "QUANTITY": "Cantidad",
             "TOTAL": "Total",
             "PLACE_ORDER": "Realizar Pedido"
+        },
+        "REGISTER": {
+            "TITLE": "¿Eres nuevo aquí?",
+            "DESC": "Crea una cuenta para guardar tus boletos y dar seguimiento a tu pedido.",
+            "BUTTON": "Crear Cuenta"
         }
     },
     "PROFILE": {

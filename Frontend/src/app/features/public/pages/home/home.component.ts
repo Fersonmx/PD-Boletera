@@ -34,37 +34,67 @@ import { environment } from '../../../../../environments/environment';
           <div class="container mx-auto px-4 relative z-10 pt-20">
             <div class="max-w-4xl animate-fadeIn">
               @if(activeSlide()) {
-                  <span class="inline-block py-1 px-3 rounded-full bg-pink-600/90 text-white text-xs font-bold tracking-wider mb-4 uppercase backdrop-blur-sm">
-                    {{ activeSlide()?.subtitle || (activeSlide()?.event?.date | date:'fullDate') }}
-                  </span>
-                  <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight tracking-tight drop-shadow-lg">
-                    {{ activeSlide()?.title || activeSlide()?.event?.title }}
-                  </h1>
-                  
-                  <div class="flex flex-wrap gap-4">
-                    @if(activeSlide()?.event?.id) {
-                        <a [routerLink]="['/events', activeSlide()?.event?.id]" class="px-8 py-4 bg-white text-black rounded-full font-bold hover:bg-gray-200 transition transform hover:-translate-y-1 shadow-lg shadow-white/10 text-lg">
-                          {{ 'HOME.HERO.CTA' | translate }}
-                        </a>
-                    }
-                  </div>
+                  @if(activeSlide().type === 'branding') {
+                       <span class="inline-block py-1 px-3 rounded-full bg-primary/90 text-white text-xs font-bold tracking-wider mb-4 uppercase backdrop-blur-sm">
+                        {{ activeSlide().subtitle }}
+                      </span>
+                      <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight tracking-tight drop-shadow-lg">
+                        {{ activeSlide().title }}
+                      </h1>
+                      <p class="text-white text-xl mb-8 font-light italic">{{ activeSlide().description }}</p>
+                      
+                      <div class="flex gap-4">
+                         <a routerLink="/events" class="px-8 py-4 bg-primary text-white rounded-full font-bold hover:bg-secondary hover:text-black transition-all shadow-lg hover:shadow-primary/20">
+                           {{ 'HOME.HERO.CTA' | translate }}
+                         </a>
+                      </div>
+                  } @else {
+                      <span class="inline-block py-1 px-3 rounded-full bg-primary/90 text-white text-xs font-bold tracking-wider mb-4 uppercase backdrop-blur-sm">
+                        {{ activeSlide()?.subtitle || (activeSlide()?.event?.date | date:'fullDate') }}
+                      </span>
+                      <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight tracking-tight drop-shadow-lg">
+                        {{ activeSlide()?.title || activeSlide()?.event?.title }}
+                      </h1>
+                      
+                      <div class="flex flex-wrap gap-4">
+                        @if(activeSlide()?.event?.id) {
+                            <a [routerLink]="['/events', activeSlide()?.event?.id]" class="px-8 py-4 bg-primary text-white rounded-full font-bold hover:bg-secondary hover:text-black transition-all shadow-lg hover:shadow-primary/20">
+                              {{ 'HOME.HERO.CTA' | translate }}
+                            </a>
+                        }
+                      </div>
+                  }
 
-                  <!-- Slider Controls -->
+                  <!-- Slider Controls (Arrows & Indicators) -->
                   @if(slides().length > 1) {
-                      <div class="flex gap-2 mt-12">
-                          @for(slide of slides(); track slide.id; let i = $index) {
-                              <button (click)="setActiveSlide(i)" 
-                                      [class]="currentSlideIndex() === i ? 'w-8 bg-pink-500' : 'w-2 bg-gray-500 hover:bg-gray-400'"
-                                      class="h-1 rounded-full transition-all duration-300">
-                              </button>
-                          }
+                      <div class="absolute bottom-10 left-0 w-full flex items-center justify-between pointer-events-none">
+                           <!-- Dots -->
+                           <div class="flex gap-2 pointer-events-auto">
+                              @for(slide of slides(); track slide.id; let i = $index) {
+                                  <button (click)="setActiveSlide(i)" 
+                                          [class]="currentSlideIndex() === i ? 'w-8 bg-primary' : 'w-2 bg-white/50 hover:bg-white'"
+                                          class="h-1 rounded-full transition-all duration-300">
+                                  </button>
+                              }
+                           </div>
+
+                           <!-- Arrows (Right aligned relative to content container, but absolute in context) -->
+                           <div class="flex gap-3 pointer-events-auto">
+                               <button (click)="prevSlide()" class="w-10 h-10 rounded-full border border-white/30 bg-black/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white hover:text-black transition-all">
+                                   <i class="fas fa-chevron-left"></i>
+                               </button>
+                               <button (click)="nextSlide()" class="w-10 h-10 rounded-full border border-white/30 bg-black/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white hover:text-black transition-all">
+                                   <i class="fas fa-chevron-right"></i>
+                               </button>
+                           </div>
                       </div>
                   }
               } @else {
                    <!-- Fallback Content -->
-                   <h1 class="text-5xl md:text-7xl font-black text-white mb-6">Welcome to<br><span class="text-pink-500">PD_Boletera</span></h1>
+                   <h1 class="text-5xl md:text-7xl font-black text-white mb-6">WOWticket<br><span class="text-primary text-3xl block mt-4 font-bold">Una boletera digital centrada en la experiencia, no solo en la transacción.</span></h1>
+                   <p class="text-white text-xl mb-8 font-light italic">Vendemos acceso. Creamos conexión.</p>
                    <div class="flex gap-4">
-                      <a routerLink="/events" class="px-8 py-4 bg-pink-600 text-white rounded-full font-bold">Browse Events</a>
+                      <a routerLink="/events" class="px-8 py-4 bg-primary text-white rounded-full font-bold hover:bg-secondary hover:text-black transition-all">Browse Events</a>
                    </div>
               }
             </div>
@@ -77,8 +107,10 @@ import { environment } from '../../../../../environments/environment';
           @for (filter of filters; track filter) {
             <button 
               (click)="activeFilter.set(filter)"
-              class="whitespace-nowrap text-xs font-bold uppercase tracking-widest pb-2 border-b-2 transition-colors duration-200"
-              [ngClass]="activeFilter() === filter ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'">
+              class="whitespace-nowrap transition-colors duration-200"
+              [class]="activeFilter() === filter 
+                ? 'px-5 py-2 rounded-full bg-primary text-white text-xs font-bold uppercase tracking-wider hover:bg-secondary hover:text-black transition shadow-lg' 
+                : 'px-5 py-2 rounded-full bg-white border border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-100 hover:text-primary transition shadow-sm'">
               {{ filter | translate }}
             </button>
           }
@@ -101,12 +133,12 @@ import { environment } from '../../../../../environments/environment';
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 gap-y-10">
           @for (event of filteredEvents(); track event.id) {
-            <div class="group flex flex-col h-full bg-white rounded-lg transition-transform duration-300 hover:-translate-y-1">
+            <div class="group flex flex-col h-full bg-white rounded-lg transition-transform duration-300 md:hover:-translate-y-1">
               <!-- Image Card -->
               <div class="relative aspect-[3/2] bg-gray-100 mb-4 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md">
                  <img [src]="getImageUrl(event.imageUrl) || 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?auto=format&fit=crop&w=800&q=80'" 
                       alt="{{ event.title }}" 
-                      class="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105">
+                      class="object-cover w-full h-full grayscale-0 md:grayscale md:group-hover:grayscale-0 transition-all duration-500 transform md:group-hover:scale-105">
                  
                  <!-- Date Badge Overlay -->
                  <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-md text-center shadow-sm">
@@ -125,20 +157,19 @@ import { environment } from '../../../../../environments/environment';
                    {{ event.title }}
                  </h3>
                  
-                 <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                    <div class="flex flex-col">
+                 <div class="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-4">
+                    <div class="flex flex-col w-full">
                       <span class="text-xs font-bold uppercase tracking-wide text-gray-500">
                         {{ event.Venue?.city }}
                       </span>
-                      <span class="text-[10px] text-gray-400 font-medium truncate max-w-[120px]">
+                      <span class="text-[10px] text-gray-400 font-medium truncate w-full">
                         {{ event.Venue?.name }}
                       </span>
                     </div>
 
                      <a [routerLink]="['/events', event.id]" 
-                        class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-pink-600 hover:text-pink-800 transition-colors whitespace-nowrap">
+                        class="inline-flex items-center justify-center px-6 py-3 bg-primary text-white rounded-full font-bold uppercase tracking-wider text-xs hover:bg-secondary hover:text-black transition-all shadow-md hover:shadow-primary/20 w-full">
                         {{ 'HOME.FIND_TICKETS' | translate }}
-                        <i class="fas fa-arrow-right ml-1 transform group-hover:translate-x-1 transition-transform"></i>
                     </a>
                  </div>
               </div>
@@ -148,33 +179,34 @@ import { environment } from '../../../../../environments/environment';
       </div>
       
       <!-- Newsletter -->
-       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-20">
-          <div class="bg-black text-white rounded-3xl p-10 md:p-16 relative overflow-hidden shadow-2xl">
-             <!-- Decorative Gradients -->
-             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-pink-600 rounded-full blur-3xl opacity-30"></div>
-             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-indigo-600 rounded-full blur-3xl opacity-30"></div>
+       <div class="w-full mt-24">
+          <div class="relative bg-black h-[500px] flex items-center overflow-hidden">
+             <!-- Background Image -->
+             <div class="absolute inset-0 z-0">
+                <img src="assets/newsletter-bg.png" class="w-full h-full object-cover opacity-90">
+                <!-- Overlay gradient to ensure text readability -->
+                <div class="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/60 to-transparent"></div>
+             </div>
 
-             <div class="relative z-10 grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                   <h2 class="text-3xl md:text-5xl font-black uppercase leading-none mb-6 tracking-tight">{{ 'HOME.NEWSLETTER_TITLE' | translate }}</h2>
-                   <p class="text-lg text-gray-400 mb-8 max-w-md font-light">{{ 'HOME.NEWSLETTER_DESC' | translate }}</p>
+             <div class="container mx-auto px-4 relative z-10">
+                <div class="max-w-2xl">
+                   <h2 class="text-4xl md:text-6xl font-black uppercase leading-none mb-6 tracking-tight text-white drop-shadow-md">
+                     {{ 'HOME.NEWSLETTER_TITLE' | translate }}
+                   </h2>
+                   <p class="text-xl text-white mb-8 max-w-lg font-medium drop-shadow-sm">
+                     {{ 'HOME.NEWSLETTER_DESC' | translate }}
+                   </p>
                    
-                   <div class="flex flex-col sm:flex-row gap-4 max-w-lg">
+                   <div class="flex flex-col sm:flex-row gap-4 max-w-lg bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/20">
                       <input type="email" [placeholder]="'HOME.EMAIL_PLACEHOLDER' | translate" 
-                             class="flex-1 bg-white/10 border border-white/20 rounded-lg px-6 py-4 text-white placeholder:text-gray-500 font-bold focus:outline-none focus:ring-2 focus:ring-pink-500 focus:bg-white/20 transition-all">
-                      <button class="px-8 py-4 bg-white text-black font-black uppercase tracking-wider rounded-lg hover:bg-pink-500 hover:text-white transition-all transform hover:-translate-y-1 shadow-lg">
+                             class="flex-1 bg-transparent border-none px-4 py-3 text-white placeholder:text-white/70 font-bold focus:outline-none focus:ring-0 text-lg">
+                      <button class="px-8 py-3 bg-secondary text-black font-black uppercase tracking-wider rounded-lg hover:bg-white hover:text-primary transition-all shadow-lg whitespace-nowrap">
                         {{ 'HOME.SUBSCRIBE' | translate }}
                       </button>
                    </div>
-                   <p class="mt-4 text-xs text-gray-500">
+                   <p class="mt-4 text-xs text-white/70 font-medium">
                      By subscribing you agree to our Terms & Privacy Policy.
                    </p>
-                </div>
-                
-                <div class="hidden md:flex justify-center">
-                   <div class="w-64 h-64 bg-gradient-to-tr from-pink-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg animate-pulse-slow">
-                      <i class="far fa-envelope-open text-8xl text-white"></i>
-                   </div>
                 </div>
              </div>
           </div>
@@ -336,8 +368,19 @@ export class HomeComponent implements OnInit, OnDestroy {
               imageUrl: e.imageUrl,
               event: e
             }));
-            this.slides.set(fakeSlides);
-            this.activeSlide.set(fakeSlides[0]);
+
+            const brandingSlide = {
+              id: 'branding',
+              type: 'branding',
+              title: 'WOWticket',
+              subtitle: 'Una boletera digital centrada en la experiencia',
+              description: 'Vendemos acceso. Creamos conexión.',
+              imageUrl: 'assets/hero-bg-2.jpg'
+            };
+            const allSlides = [brandingSlide, ...fakeSlides];
+
+            this.slides.set(allSlides);
+            this.activeSlide.set(allSlides[0]);
             this.startSlider();
           }
         }
@@ -364,6 +407,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.slides().length === 0) return;
     const nextIndex = (this.currentSlideIndex() + 1) % this.slides().length;
     this.setActiveSlide(nextIndex);
+  }
+
+  prevSlide() {
+    if (this.slides().length === 0) return;
+    const prevIndex = (this.currentSlideIndex() - 1 + this.slides().length) % this.slides().length;
+    this.setActiveSlide(prevIndex);
   }
 
   setActiveSlide(index: number) {

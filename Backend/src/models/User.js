@@ -41,6 +41,14 @@ const User = sequelize.define('User', {
         type: DataTypes.DATE,
         allowNull: true
     },
+    resetPasswordToken: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    resetPasswordExpires: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
     role: {
         type: DataTypes.ENUM('admin', 'user'),
         defaultValue: 'user'
@@ -48,6 +56,10 @@ const User = sequelize.define('User', {
     isActive: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
+    },
+    language: {
+        type: DataTypes.ENUM('es', 'en'),
+        defaultValue: 'es'
     }
 }, {
     hooks: {

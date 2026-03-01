@@ -16,25 +16,36 @@ import { CommonModule } from '@angular/common';
           <div class="flex justify-between items-center h-20">
             
             <!-- Logo -->
-            <div class="flex-shrink-0 flex items-center gap-2">
-              <a routerLink="/" class="text-2xl font-black tracking-tighter uppercase italic bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-500 hover:to-rose-400 transition-all">
-                PD_Boletera
+        <!--     <div class="flex-shrink-0 flex items-center gap-2">
+              <a routerLink="/" class="text-2xl font-black tracking-tighter uppercase italic text-primary hover:text-primary/90 transition-all">
+                WOW Ticket
               </a>
-            </div>
+            </div> -->
+
+            <!-- Logo -->
+              <div class="flex-shrink-0 flex items-center">
+                <a routerLink="/">
+                  <img 
+                    src="assets/images/logo_color_wow.png" 
+                    alt="WOW Ticket" 
+                    class="h-10 w-auto max-w-[160px] object-contain"
+                  />
+                </a>
+              </div>
 
             <!-- Desktop Nav -->
             <nav class="hidden md:flex space-x-8 items-center">
               <a routerLink="/events" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors relative group">
                 {{ 'NAV.CONCERTS' | translate }}
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-500 transition-all group-hover:w-full"></span>
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
               </a>
               <a routerLink="/events" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors relative group">
                 {{ 'NAV.SPORTS' | translate }}
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-500 transition-all group-hover:w-full"></span>
-              </a>
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
+              </a>,
               <a routerLink="/events" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors relative group">
                 {{ 'NAV.THEATER' | translate }}
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-500 transition-all group-hover:w-full"></span>
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
               </a>
             </nav>
 
@@ -54,13 +65,13 @@ import { CommonModule } from '@angular/common';
                       <p class="text-xs font-bold text-gray-900 leading-none">{{ authService.currentUserSig()?.name }}</p>
                       <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">My Account</p>
                    </div>
-                   <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 text-white flex items-center justify-center text-sm font-bold shadow-md group-hover:shadow-pink-200 transition-all ring-2 ring-white">
+                   <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center text-sm font-bold shadow-md group-hover:shadow-secondary/20 transition-all ring-2 ring-white">
                      {{ authService.currentUserSig()?.name?.charAt(0) || 'U' }}
                    </div>
                 </a>
               } @else {
-                <a routerLink="/auth/login" class="text-xs font-bold uppercase tracking-widest text-gray-900 hover:text-pink-600 transition-colors">{{ 'NAV.LOGIN' | translate }}</a>
-                <a routerLink="/auth/register" class="px-6 py-2.5 rounded-full bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-pink-600 transition-colors shadow-lg hover:shadow-pink-200 transform hover:-translate-y-0.5 duration-200">
+                <a routerLink="/auth/login" class="text-xs font-bold uppercase tracking-widest text-gray-900 hover:text-primary transition-colors">{{ 'NAV.LOGIN' | translate }}</a>
+                <a routerLink="/auth/register" class="px-6 py-2.5 rounded-full bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-secondary hover:text-black transition-colors shadow-lg hover:shadow-secondary/20 transform hover:-translate-y-0.5 duration-200">
                   {{ 'NAV.REGISTER' | translate }}
                 </a>
               }
@@ -90,7 +101,7 @@ import { CommonModule } from '@angular/common';
 
                 @if (authService.isAuthenticated) {
                     <a routerLink="/profile" (click)="closeMobileMenu()" class="flex items-center gap-3 py-2 bg-gray-50 rounded-lg px-4">
-                        <div class="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center text-xs font-bold">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
                             {{ authService.currentUserSig()?.name?.charAt(0) || 'U' }}
                         </div>
                         <span class="font-bold text-gray-900">{{ 'NAV.PROFILE' | translate }}</span>
@@ -115,38 +126,48 @@ import { CommonModule } from '@angular/common';
       </main>
 
       <!-- Footer -->
-      <footer class="bg-black text-white py-16 border-t border-gray-800">
+      <footer class="bg-black text-white py-20 border-t border-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-12 mb-12">
-                <div class="col-span-1 md:col-span-2">
-                    <h3 class="text-2xl font-black italic bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-400 mb-6">PD_BOLETERA</h3>
-                    <p class="text-gray-400 max-w-sm">{{ 'FOOTER.DESCRIPTION' | translate }}</p>
+            <div class="grid md:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-1 md:col-span-1">
+                  <!--   <h3 class="text-2xl font-black italic text-primary mb-6 tracking-tighter">WOW Ticket</h3> -->
+                    <img 
+                        src="assets/images/logo_bco_wow.png" 
+                        alt="WOW Ticket"
+                        class="h-8 w-auto max-w-[140px] object-contain mb-6"
+                      />
+                <p class="text-gray-400 text-sm leading-relaxed max-w-sm">{{ 'FOOTER.DESCRIPTION' | translate }}</p>
                 </div>
+                
+                <div class="col-span-1 md:col-span-1"></div>
+
                 <div>
-                    <h4 class="font-bold uppercase tracking-widest mb-6">{{ 'FOOTER.EXPLORE' | translate }}</h4>
-                    <ul class="space-y-4 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition">{{ 'FOOTER.LINKS.CONCERTS' | translate }}</a></li>
-                        <li><a href="#" class="hover:text-white transition">{{ 'FOOTER.LINKS.SPORTS' | translate }}</a></li>
-                        <li><a href="#" class="hover:text-white transition">{{ 'FOOTER.LINKS.THEATER' | translate }}</a></li>
-                        <li><a href="#" class="hover:text-white transition">{{ 'FOOTER.LINKS.FESTIVALS' | translate }}</a></li>
+                    <h4 class="font-bold uppercase tracking-widest text-xs text-white mb-8">{{ 'FOOTER.EXPLORE' | translate }}</h4>
+                    <ul class="space-y-4">
+                        <li><a routerLink="/events" class="text-gray-400 hover:text-secondary transition-colors text-sm font-medium">{{ 'FOOTER.LINKS.CONCERTS' | translate }}</a></li>
+                        <li><a routerLink="/events" class="text-gray-400 hover:text-secondary transition-colors text-sm font-medium">{{ 'FOOTER.LINKS.SPORTS' | translate }}</a></li>
+                        <li><a routerLink="/events" class="text-gray-400 hover:text-secondary transition-colors text-sm font-medium">{{ 'FOOTER.LINKS.THEATER' | translate }}</a></li>
+                        <li><a routerLink="/events" class="text-gray-400 hover:text-secondary transition-colors text-sm font-medium">{{ 'FOOTER.LINKS.FESTIVALS' | translate }}</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-bold uppercase tracking-widest mb-6">{{ 'FOOTER.SUPPORT' | translate }}</h4>
-                    <ul class="space-y-4 text-gray-400">
-                        <li><a routerLink="/page/help-center" class="hover:text-white transition">{{ 'FOOTER.LINKS.HELP_CENTER' | translate }}</a></li>
-                        <li><a routerLink="/page/contact-us" class="hover:text-white transition">{{ 'FOOTER.LINKS.CONTACT_US' | translate }}</a></li>
-                        <li><a routerLink="/page/privacy-policy" class="hover:text-white transition">{{ 'FOOTER.LINKS.PRIVACY' | translate }}</a></li>
-                        <li><a routerLink="/page/terms-of-service" class="hover:text-white transition">{{ 'FOOTER.LINKS.TERMS' | translate }}</a></li>
+                    <h4 class="font-bold uppercase tracking-widest text-xs text-white mb-8">{{ 'FOOTER.SUPPORT' | translate }}</h4>
+                    <ul class="space-y-4">
+                        <li><a routerLink="/page/help-center" class="text-gray-400 hover:text-secondary transition-colors text-sm font-medium">{{ 'FOOTER.LINKS.HELP_CENTER' | translate }}</a></li>
+                        <li><a routerLink="/page/contact-us" class="text-gray-400 hover:text-secondary transition-colors text-sm font-medium">{{ 'FOOTER.LINKS.CONTACT_US' | translate }}</a></li>
+                        <li><a routerLink="/page/privacy-policy" class="text-gray-400 hover:text-secondary transition-colors text-sm font-medium">{{ 'FOOTER.LINKS.PRIVACY' | translate }}</a></li>
+                        <li><a routerLink="/page/terms-of-service" class="text-gray-400 hover:text-secondary transition-colors text-sm font-medium">{{ 'FOOTER.LINKS.TERMS' | translate }}</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-               <p class="text-gray-500 text-sm">{{ 'FOOTER.RIGHTS' | translate }} © 2025</p>
-               <div class="flex gap-4">
-                   <a href="#" class="text-gray-500 hover:text-white transition"><i class="fab fa-twitter"></i></a>
-                   <a href="#" class="text-gray-500 hover:text-white transition"><i class="fab fa-instagram"></i></a>
-                   <a href="#" class="text-gray-500 hover:text-white transition"><i class="fab fa-facebook"></i></a>
+            
+            <div class="border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+               <p class="text-gray-600 text-xs font-medium">{{ 'FOOTER.RIGHTS' | translate }} © 2025 PD_Boletera. All rights reserved.</p>
+               <div class="flex gap-6">
+                   <a href="#" class="text-gray-500 hover:text-secondary transition-colors text-lg"><i class="fab fa-twitter"></i></a>
+                   <a href="#" class="text-gray-500 hover:text-secondary transition-colors text-lg"><i class="fab fa-instagram"></i></a>
+                   <a href="#" class="text-gray-500 hover:text-secondary transition-colors text-lg"><i class="fab fa-facebook"></i></a>
+                   <a href="#" class="text-gray-500 hover:text-secondary transition-colors text-lg"><i class="fab fa-tiktok"></i></a>
                </div>
             </div>
         </div>

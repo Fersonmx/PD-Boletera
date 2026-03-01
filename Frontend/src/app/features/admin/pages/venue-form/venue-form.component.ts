@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { VenueService, Venue, VenueLayout, VenueSection } from '../../../../core/services/venue.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-venue-form',
@@ -81,11 +83,22 @@ import { VenueService, Venue, VenueLayout, VenueSection } from '../../../../core
                                  (click)="selectLayout(layout)">
                                 <div class="flex items-center justify-between gap-2 mb-2">
                                      <input type="text" [(ngModel)]="layout.name" placeholder="Layout Name" class="block w-full font-bold text-sm border-0 bg-transparent focus:ring-0 p-0 placeholder-gray-400">
-                                     <button (click)="removeLayout(lIndex); $event.stopPropagation()" class="text-gray-400 hover:text-red-500">
-                                        <i class="fas fa-trash"></i>
-                                     </button>
+                                     <div class="flex items-center gap-2">
+                                         <button (click)="duplicateLayout(layout); $event.stopPropagation()" class="text-gray-400 hover:text-blue-500" title="Duplicate Layout">
+                                            <i class="fas fa-copy"></i>
+                                         </button>
+                                         <button (click)="removeLayout(lIndex); $event.stopPropagation()" class="text-gray-400 hover:text-red-500" title="Delete Layout">
+                                            <i class="fas fa-trash"></i>
+                                         </button>
+                                     </div>
                                 </div>
-                                <input type="text" [(ngModel)]="layout.imageUrl" placeholder="Image URL (http...)" class="block w-full text-[10px] text-gray-500 border border-gray-200 rounded p-1 mb-2">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <input type="text" [(ngModel)]="layout.imageUrl" placeholder="Image URL (http...)" class="block w-full text-[10px] text-gray-500 border border-gray-200 rounded p-1">
+                                    <label class="cursor-pointer bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-700 px-3 py-1.5 rounded-lg flex items-center font-bold text-[10px] uppercase tracking-wide transition-colors whitespace-nowrap shadow-sm" title="Upload Image or SVG">
+                                        <i class="fas fa-cloud-upload-alt text-sm mr-2"></i> Subir Mapa (.svg, .png)
+                                        <input type="file" class="hidden" accept=".svg,.png,.jpg,.jpeg,.webp" (change)="uploadImage($event, layout)">
+                                    </label>
+                                </div>
                                 
                                 <div class="text-xs text-gray-400 font-medium">
                                     {{ layout.sections?.length || 0 }} Sections Defined
@@ -139,13 +152,63 @@ import { VenueService, Venue, VenueLayout, VenueSection } from '../../../../core
                          style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;">
                     </div>
 
+                    @if (tool === 'draw') {
+                    <div class="absolute top-6 left-1/2 transform -translate-x-1/2 bg-gray-900/80 text-white px-5 py-2.5 rounded-full text-[11px] uppercase tracking-wide font-bold flex items-center shadow-lg z-30 pointer-events-none animate-fadeIn">
+                        <i class="fas fa-info-circle mr-2 text-pink-400 text-sm"></i>
+                        Click for corners. Hold <kbd class="mx-1.5 px-1.5 py-0.5 bg-gray-700 rounded border border-gray-600 shadow-sm text-pink-300">Option / Alt</kbd> to add curve points. Dbl-Click to close.
+                    </div>
+                    }
+
                     @if (!activeLayout) {
-                        <div class="absolute inset-0 flex items-center justify-center text-gray-400 pointer-events-none">
+                        <div class="absolute inset-0 flex items-center justify-center text-gray-400 pointer-events-none bg-gray-50">
                             Select a layout to start editing
                         </div>
                     } @else if (!activeLayout.imageUrl) {
-                        <div class="absolute inset-0 flex items-center justify-center text-gray-400 pointer-events-none z-10">
-                            Please add a background image URL to the layout
+                        <div class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gray-50 z-10 w-full h-full overflow-y-auto pointer-events-auto"
+                             (mousedown)="$event.stopPropagation()"
+                             (wheel)="$event.stopPropagation()">
+                            <div class="text-center mb-8 max-w-md">
+                                <div class="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
+                                    <i class="fas fa-layer-group text-2xl text-gray-400"></i>
+                                </div>
+                                <h3 class="text-xl font-black text-gray-900 mb-2 tracking-tight">Manual Layout Mode</h3>
+                                <p class="text-sm text-gray-500">Provide an Image URL on the left to activate the Visual Editor, or create sections manually below.</p>
+                            </div>
+
+                            <div class="w-full max-w-2xl bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
+                                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-50">
+                                    <div>
+                                         <h4 class="font-bold text-gray-900 text-lg uppercase tracking-tight">Sections</h4>
+                                         <p class="text-xs text-gray-400 font-medium">Define sections and capacities for this layout</p>
+                                    </div>
+                                    <button (click)="addManualSection()" class="px-5 py-2.5 bg-black text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-all hover:shadow-lg transform hover:-translate-y-0.5">
+                                        <i class="fas fa-plus mr-2"></i> Add Section
+                                    </button>
+                                </div>
+
+                                <div class="space-y-3">
+                                    @for (section of activeLayout.sections; track $index; let i = $index) {
+                                        <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-200/60 focus-within:ring-2 focus-within:ring-pink-500/20 focus-within:border-pink-500 transition-all">
+                                            <div class="flex-1 bg-white rounded-lg p-2 border border-gray-100 shadow-sm">
+                                                <label class="block text-[10px] uppercase font-bold text-gray-400 mb-0.5 px-1">Section Name</label>
+                                                <input [(ngModel)]="section.name" placeholder="E.g. VIP, General" class="w-full text-sm font-bold border-0 bg-transparent focus:ring-0 p-1 text-gray-900">
+                                            </div>
+                                            <div class="w-32 bg-white rounded-lg p-2 border border-gray-100 shadow-sm">
+                                                <label class="block text-[10px] uppercase font-bold text-gray-400 mb-0.5 px-1">Capacity</label>
+                                                <input [(ngModel)]="section.capacity" type="number" placeholder="0" class="w-full text-sm font-bold border-0 bg-transparent focus:ring-0 p-1 text-gray-900 text-right">
+                                            </div>
+                                            <button (click)="removeManualSection(i)" class="text-gray-400 hover:text-red-500 p-3 bg-white border border-gray-100 shadow-sm rounded-lg hover:bg-red-50 transition-colors">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    @if (!activeLayout.sections || activeLayout.sections.length === 0) {
+                                        <div class="text-center py-12 text-sm text-gray-400 italic bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                                            No sections defined yet. Click "Add Section" to begin.
+                                        </div>
+                                    }
+                                </div>
+                            </div>
                         </div>
                     }
 
@@ -158,7 +221,7 @@ import { VenueService, Venue, VenueLayout, VenueSection } from '../../../../core
                          }
 
                          <!-- SVG Overlay -->
-                         <svg class="absolute inset-0 w-full h-full overflow-visible pointer-events-none">
+                         <svg class="absolute inset-0 w-full h-full overflow-visible pointer-events-none z-10">
                              <!-- Existing Sections -->
                              @if (activeLayout) {
                                  @for (section of activeLayout.sections; track $index) {
@@ -177,22 +240,54 @@ import { VenueService, Venue, VenueLayout, VenueSection } from '../../../../core
 
                              <!-- Drawing Draft -->
                              @if (isDrawing && currentPoints.length > 0) {
-                                <path [attr.d]="getCurrentPathString()" class="fill-pink-500/20 stroke-pink-500 stroke-2 dashed pointer-events-none"></path>
+                                <path [attr.d]="getCurrentPathString()" class="fill-pink-500/20 stroke-pink-500 stroke-2 pointer-events-none" [class.dashed]="!isDrawingClosed"></path>
                                 @for (p of currentPoints; track $index) {
-                                    <circle [attr.cx]="p.x" [attr.cy]="p.y" r="4" class="fill-white stroke-pink-600 stroke-2"></circle>
-                                }
-                                <!-- Rubber band line -->
-                                @if (cursorPos) {
-                                    <line [attr.x1]="currentPoints[currentPoints.length-1].x" 
-                                          [attr.y1]="currentPoints[currentPoints.length-1].y"
-                                          [attr.x2]="cursorPos.x" 
-                                          [attr.y2]="cursorPos.y" 
-                                          class="stroke-pink-400 stroke-2 stroke-dasharray-4"></line>
+                                    <circle [attr.cx]="p.x" [attr.cy]="p.y" r="4" 
+                                            class="stroke-pink-600 stroke-2 pointer-events-none"
+                                            [class.fill-yellow-400]="p.isControl" 
+                                            [class.fill-white]="!p.isControl"></circle>
                                 }
                              }
                          </svg>
                     </div>
                 </div>
+
+                <!-- Sections List Panel (Floating left) -->
+                @if (activeLayout?.imageUrl) {
+                    <div class="absolute top-16 left-4 bg-white rounded-xl shadow-lg border border-gray-200 w-64 z-30 max-h-[calc(100vh-250px)] flex flex-col pointer-events-auto">
+                        <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl">
+                            <h4 class="font-bold text-xs uppercase text-gray-900 tracking-wider">Sections</h4>
+                            <button (click)="addManualSection()" class="text-[10px] bg-black text-white px-2 py-1 rounded hover:bg-gray-800"><i class="fas fa-plus mr-1"></i> Add</button>
+                        </div>
+                        <div class="overflow-y-auto p-2 space-y-2">
+                            @for (section of activeLayout?.sections; track $index) {
+                                <div class="p-2 rounded-lg border text-sm cursor-pointer transition-colors flex justify-between items-center"
+                                     [class.bg-pink-50]="selectedSection === section"
+                                     [class.border-pink-200]="selectedSection === section"
+                                     [class.border-gray-100]="selectedSection !== section"
+                                     (click)="selectSection(section)">
+                                     <div>
+                                         <div class="font-bold text-gray-900 leading-none mb-1 text-xs">{{ section.name }}</div>
+                                         <div class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-full inline-flex items-center"
+                                              [class.bg-green-100]="section.visualData"
+                                              [class.text-green-700]="section.visualData"
+                                              [class.bg-yellow-100]="!section.visualData"
+                                              [class.text-yellow-700]="!section.visualData">
+                                             <i class="fas text-[8px] mr-1" [class.fa-check]="section.visualData" [class.fa-exclamation-triangle]="!section.visualData"></i>
+                                             {{ section.visualData ? 'Mapped' : 'No Area' }}
+                                         </div>
+                                     </div>
+                                     <div class="text-[10px] font-bold text-gray-400">
+                                        <i class="fas fa-users mr-1"></i> {{ section.capacity }}
+                                     </div>
+                                </div>
+                            }
+                            @if (!activeLayout?.sections || activeLayout?.sections?.length === 0) {
+                                <div class="text-center p-4 text-xs text-gray-400">No sections added</div>
+                            }
+                        </div>
+                    </div>
+                }
 
                 <!-- Section Properties Panel (Floating) -->
                 @if (selectedSection) {
@@ -244,7 +339,8 @@ export class VenueFormComponent implements OnInit {
 
     // Drawing State
     isDrawing = false;
-    currentPoints: { x: number, y: number }[] = [];
+    isDrawingClosed = false;
+    currentPoints: { x: number, y: number, isControl?: boolean }[] = [];
     cursorPos: { x: number, y: number } | null = null;
 
     // Selection State
@@ -253,7 +349,8 @@ export class VenueFormComponent implements OnInit {
     constructor(
         private venueService: VenueService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private http: HttpClient
     ) { }
 
     ngOnInit() {
@@ -273,6 +370,46 @@ export class VenueFormComponent implements OnInit {
         const newLayout: VenueLayout = { name: 'New Layout', sections: [], imageUrl: '' };
         this.venue.layouts.push(newLayout);
         this.selectLayout(newLayout);
+    }
+
+    duplicateLayout(layout: VenueLayout) {
+        if (!this.venue.layouts) this.venue.layouts = [];
+        // Deep clone layout and sections, removing IDs to treat as new inserts
+        const clonedSections: VenueSection[] = (layout.sections || []).map(s => {
+            const { id, layoutId, ...rest } = s;
+            return { ...rest };
+        });
+
+        const clonedLayout: VenueLayout = {
+            name: layout.name + ' (Copy)',
+            imageUrl: layout.imageUrl,
+            sections: clonedSections
+        };
+
+        this.venue.layouts.push(clonedLayout);
+        this.selectLayout(clonedLayout);
+    }
+
+    uploadImage(event: any, layout: VenueLayout) {
+        const file = event.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const token = localStorage.getItem('token');
+            const headers = { Authorization: `Bearer ${token}` };
+
+            this.http.post<any>(`${environment.apiUrl}/upload`, formData, { headers }).subscribe({
+                next: (res) => {
+                    const baseUrl = environment.apiUrl.replace('/api', '');
+                    layout.imageUrl = baseUrl + res.filePath;
+                },
+                error: (err) => {
+                    console.error('Upload failed', err);
+                    alert('Failed to upload image');
+                }
+            });
+        }
     }
 
     removeLayout(index: number) {
@@ -322,15 +459,23 @@ export class VenueFormComponent implements OnInit {
         } else if (this.tool === 'draw') {
             // Add Point
             const coords = this.getMapCoordinates(event);
+            const isControl = event.altKey;
 
             if (!this.isDrawing) {
                 this.isDrawing = true;
-                this.currentPoints = [coords];
+                this.isDrawingClosed = false;
+                this.currentPoints = [{ ...coords, isControl: false }]; // First point is always anchor
                 this.selectedSection = null; // Deselect while drawing
             } else {
-                // Check if clicking near start point to close?
-                // Let's rely on Double Click to close for now to be simpler.
-                this.currentPoints.push(coords);
+                // Check if clicking near start point to close
+                const startPoint = this.currentPoints[0];
+                const distance = Math.sqrt(Math.pow(coords.x - startPoint.x, 2) + Math.pow(coords.y - startPoint.y, 2));
+
+                if (distance < 10 / this.zoomLevel && this.currentPoints.length >= 2) {
+                    this.finishPolygon();
+                } else {
+                    this.currentPoints.push({ ...coords, isControl });
+                }
             }
         }
     }
@@ -383,32 +528,73 @@ export class VenueFormComponent implements OnInit {
         this.panY = 0;
     }
 
-    getCurrentPathString(): string {
-        if (this.currentPoints.length === 0) return '';
-        const d = this.currentPoints.map((p, i) => (i === 0 ? 'M' : 'L') + ` ${p.x} ${p.y}`).join(' ');
-        if (this.cursorPos) {
-            // We don't add cursor pos to D string to avoid jitter in the fill, just show line?
-            // Actually for filled preview it's better not to close yet.
+    getMixedPathString(pts: { x: number, y: number, isControl?: boolean }[], closed: boolean, cursor: { x: number, y: number } | null = null): string {
+        if (pts.length === 0) return '';
+        let d = `M ${pts[0].x} ${pts[0].y}`;
+
+        let i = 1;
+        while (i < pts.length) {
+            const p = pts[i];
+            if (p.isControl) {
+                const nextP = pts[i + 1];
+                if (nextP) {
+                    // P is control, nextP is end
+                    d += ` Q ${p.x} ${p.y}, ${nextP.x} ${nextP.y}`;
+                    i += 2;
+                } else {
+                    // P is control, but no next point.
+                    if (closed) {
+                        d += ` Q ${p.x} ${p.y}, ${pts[0].x} ${pts[0].y}`;
+                    } else if (cursor) {
+                        d += ` Q ${p.x} ${p.y}, ${cursor.x} ${cursor.y}`;
+                    }
+                    i++;
+                }
+            } else {
+                d += ` L ${p.x} ${p.y}`;
+                i++;
+            }
         }
+
+        // Draw rubber band line from the last anchor point to the cursor
+        if (!closed && cursor && pts.length > 0 && !pts[pts.length - 1].isControl) {
+            d += ` L ${cursor.x} ${cursor.y}`;
+        }
+
+        if (closed) {
+            d += ' Z';
+        }
+
         return d;
+    }
+
+    getCurrentPathString(): string {
+        return this.getMixedPathString(this.currentPoints, this.isDrawingClosed, this.isDrawingClosed ? null : this.cursorPos);
     }
 
     finishPolygon() {
         if (!this.activeLayout) return;
 
-        // Close the path
-        const d = this.currentPoints.map((p, i) => (i === 0 ? 'M' : 'L') + ` ${p.x} ${p.y}`).join(' ') + ' Z';
+        this.isDrawingClosed = true;
 
-        // Add Section
-        if (!this.activeLayout.sections) this.activeLayout.sections = [];
-        const newSection: VenueSection = {
-            name: 'Section ' + (this.activeLayout.sections.length + 1),
-            capacity: 100,
-            visualData: d,
-            layoutId: this.activeLayout.id
-        };
-        this.activeLayout.sections.push(newSection);
-        this.selectSection(newSection);
+        // Finalize Path
+        const d = this.getCurrentPathString();
+
+        if (this.selectedSection) {
+            // Assign to existing selected section
+            this.selectedSection.visualData = d;
+        } else {
+            // Add new Section
+            if (!this.activeLayout.sections) this.activeLayout.sections = [];
+            const newSection: VenueSection = {
+                name: 'Section ' + (this.activeLayout.sections.length + 1),
+                capacity: 100,
+                visualData: d,
+                layoutId: this.activeLayout.id
+            };
+            this.activeLayout.sections.push(newSection);
+            this.selectSection(newSection);
+        }
 
         // Reset
         this.isDrawing = false;
@@ -429,14 +615,37 @@ export class VenueFormComponent implements OnInit {
         }
     }
 
+    addManualSection() {
+        if (!this.activeLayout) return;
+        if (!this.activeLayout.sections) this.activeLayout.sections = [];
+        this.activeLayout.sections.push({
+            name: 'New Section ' + (this.activeLayout.sections.length + 1),
+            capacity: 100,
+            layoutId: this.activeLayout.id
+        });
+    }
+
+    removeManualSection(index: number) {
+        if (!this.activeLayout || !this.activeLayout.sections) return;
+        this.activeLayout.sections.splice(index, 1);
+    }
+
     saveVenue() {
         if (this.isEditMode) {
-            this.venueService.updateVenue(this.venue.id, this.venue).subscribe(() => {
-                alert('Venue Updated!');
+            this.venueService.updateVenue(this.venue.id, this.venue).subscribe({
+                next: () => alert('Venue Updated!'),
+                error: (err) => {
+                    const msg = err.error?.message || 'Error updating venue';
+                    alert(msg);
+                }
             });
         } else {
-            this.venueService.createVenue(this.venue).subscribe(() => {
-                this.router.navigate(['/admin/venues']);
+            this.venueService.createVenue(this.venue).subscribe({
+                next: () => this.router.navigate(['/admin/venues']),
+                error: (err) => {
+                    const msg = err.error?.message || 'Error creating venue';
+                    alert(msg);
+                }
             });
         }
     }

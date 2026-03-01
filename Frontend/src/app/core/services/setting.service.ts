@@ -22,4 +22,19 @@ export class SettingService {
         const headers = { Authorization: `Bearer ${token}` };
         return this.http.put<any>(this.apiUrl, { key, value }, { headers });
     }
+
+    testEmail(config: any): Observable<any> {
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        return this.http.post<any>(`${this.apiUrl}/test-email`, config, { headers });
+    }
+
+    getEmailLogs(type?: string, status?: string): Observable<any[]> {
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        let url = `${this.apiUrl}/email-logs?`;
+        if (type) url += `type=${type}&`;
+        if (status) url += `status=${status}`;
+        return this.http.get<any[]>(url, { headers });
+    }
 }

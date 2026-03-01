@@ -10,6 +10,7 @@ const VenueSection = require('./VenueSection');
 const VenueLayout = require('./VenueLayout');
 const PromoCode = require('./PromoCode');
 const Setting = require('./Setting');
+const EmailLog = require('./EmailLog');
 const HeroSlide = require('./HeroSlide');
 const EventTier = require('./EventTier');
 const Page = require('./Page');
@@ -92,6 +93,7 @@ module.exports = {
     OrderTicket,
     PromoCode,
     Setting,
+    EmailLog,
     HeroSlide,
     Page,
     EventTier

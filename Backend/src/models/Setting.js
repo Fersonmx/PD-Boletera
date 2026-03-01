@@ -13,7 +13,7 @@ const Setting = sequelize.define('Setting', {
         unique: true
     },
     value: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     description: {

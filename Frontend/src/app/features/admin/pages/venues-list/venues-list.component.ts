@@ -2,21 +2,22 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { VenueService, Venue } from '../../../../core/services/venue.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-venues-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="px-0 sm:px-0 lg:px-0">
       <div class="sm:flex sm:items-center justify-between mb-8">
         <div class="sm:flex-auto">
-          <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tight">Venues</h1>
+          <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tight">{{ 'ADMIN.VENUES_LIST.TITLE' | translate }}</h1>
           <p class="mt-2 text-sm text-gray-500">Manage your event locations and seating charts.</p>
         </div>
         <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <a routerLink="/admin/venues/new" class="block rounded-lg bg-pink-600 px-5 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-pink-200 hover:bg-pink-700 transition-all hover:-translate-y-0.5">
-            Create Venue
+            {{ 'ADMIN.VENUES_LIST.BTN_CREATE' | translate }}
           </a>
         </div>
       </div>
@@ -28,11 +29,11 @@ import { VenueService, Venue } from '../../../../core/services/venue.service';
               <table class="min-w-full divide-y divide-gray-100">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col" class="py-4 pl-4 pr-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 sm:pl-6">Name</th>
-                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Location</th>
-                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Capacity</th>
+                    <th scope="col" class="py-4 pl-4 pr-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 sm:pl-6">{{ 'ADMIN.VENUES_LIST.TH_VENUE' | translate }}</th>
+                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{{ 'ADMIN.VENUES_LIST.TH_CITY' | translate }}</th>
+                    <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">{{ 'ADMIN.VENUES_LIST.TH_CAPACITY' | translate }}</th>
                      <th scope="col" class="px-3 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Layouts</th>
-                    <th scope="col" class="px-3 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-500">Actions</th>
+                    <th scope="col" class="px-3 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-500">{{ 'ADMIN.VENUES_LIST.TH_ACTION' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 bg-white">
@@ -50,14 +51,14 @@ import { VenueService, Venue } from '../../../../core/services/venue.service';
                         </span>
                       </td>
                       <td class="whitespace-nowrap px-3 py-4 text-right text-sm font-medium">
-                        <a [routerLink]="['/admin/venues/edit', venue.id]" class="text-pink-600 hover:text-pink-900 mr-4 font-bold uppercase text-xs tracking-wider">Edit</a>
-                        <button (click)="deleteVenue(venue.id)" class="text-gray-400 hover:text-red-600 font-bold uppercase text-xs tracking-wider transition-colors">Delete</button>
+                        <a [routerLink]="['/admin/venues/edit', venue.id]" class="text-pink-600 hover:text-pink-900 mr-4 font-bold uppercase text-xs tracking-wider">{{ 'ADMIN.VENUES_LIST.BTN_EDIT' | translate }}</a>
+                        <button (click)="deleteVenue(venue.id)" class="text-gray-400 hover:text-red-600 font-bold uppercase text-xs tracking-wider transition-colors">{{ 'ADMIN.VENUES_LIST.BTN_DELETE' | translate }}</button>
                       </td>
                     </tr>
                   }
                   @if (venues().length === 0) {
                      <tr>
-                        <td colspan="5" class="text-center py-12 text-gray-400 italic">No venues found.</td>
+                        <td colspan="5" class="text-center py-12 text-gray-400 italic">{{ 'ADMIN.VENUES_LIST.EMPTY' | translate }}</td>
                     </tr>
                   }
                 </tbody>

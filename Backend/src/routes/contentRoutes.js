@@ -5,6 +5,7 @@ const contentController = require('../controllers/contentController');
 // Public
 router.get('/slides', contentController.getHeroSlides);
 router.get('/pages/:slug', contentController.getPageBySlug);
+router.post('/pages/:slug/contact', require('../controllers/contactController').sendContactForm);
 
 // Admin (Should add auth middleware in real app, simplified for now or rely on frontend routing guard + general api protection)
 router.post('/slides', contentController.createHeroSlide);

@@ -19,8 +19,32 @@ export class UserService {
     constructor(private http: HttpClient) { }
 
     getUsers(params: any = {}): Observable<UserResponse> {
+        return this.http.get<UserResponse>(this.apiUrl, { params: this.getParams(params), headers: this.getHeaders() });
+    }
+
+    getUserById(id: number): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    }
+
+    createUser(data: any): Observable<any> {
+        return this.http.post<any>(this.apiUrl, data, { headers: this.getHeaders() });
+    }
+
+    updateUser(id: number, data: any): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/${id}`, data, { headers: this.getHeaders() });
+    }
+
+    deleteUser(id: number): Observable<any> {
+        return this.http.delete<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    }
+
+    private getHeaders() {
         const token = localStorage.getItem('token');
-        const headers = { Authorization: `Bearer ${token}` };
-        return this.http.get<UserResponse>(this.apiUrl, { headers, params });
+        return { Authorization: `Bearer ${token}` };
+    }
+
+    private getParams(params: any) {
+        // Simple pass-through for now, can be extended
+        return params;
     }
 }

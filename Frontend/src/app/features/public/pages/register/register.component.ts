@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from '../../../../../environments/environment';
@@ -122,7 +122,11 @@ export class RegisterComponent {
   tempUserId: number | null = null;
   verificationCode = '';
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(private auth: AuthService, private router: Router, private route: ActivatedRoute) { }
+
+  private get returnUrl(): string {
+    return this.route.snapshot.queryParams['returnUrl'] || '/';
+  }
 
   register() {
     this.auth.register({
@@ -136,7 +140,7 @@ export class RegisterComponent {
           this.step = 'verify';
           this.tempUserId = res.userId;
         } else {
-          this.router.navigate(['/']);
+          this.router.navigateByUrl(this.returnUrl);
         }
       },
       error: (err) => alert('Registration failed: ' + (err.error?.message || err.message))
@@ -146,7 +150,7 @@ export class RegisterComponent {
   verifyCode() {
     if (!this.tempUserId) return;
     this.auth.verifySms(this.tempUserId, this.verificationCode).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => this.router.navigateByUrl(this.returnUrl),
       error: (err) => alert('Verification failed: ' + (err.error?.message || err.message))
     });
   }
@@ -180,7 +184,7 @@ export class RegisterComponent {
       };
 
       this.auth.googleLogin(googleUser).subscribe({
-        next: () => this.router.navigate(['/']),
+        next: () => this.router.navigateByUrl(this.returnUrl),
         error: (err) => alert('Google Login failed: ' + err.message)
       });
     }
@@ -210,7 +214,7 @@ export class RegisterComponent {
       };
 
       this.auth.googleLogin(mockGoogleUser).subscribe({
-        next: () => this.router.navigate(['/']),
+        next: () => this.router.navigateByUrl(this.returnUrl),
         error: (err) => alert('Google Login failed')
       });
       return;

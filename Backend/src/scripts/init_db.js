@@ -23,7 +23,7 @@ async function initializeDatabase() {
         // alter: true updates tables if they exist, force: true drops them.
         // We use alter: true for safety in dev, or force: true for fresh start if argument provided.
         // Initialize standard models
-        await sequelize.sync({ alter: true }); // Use alter to add columns without dropping
+        await sequelize.sync(); // Removed alter: true to avoid ER_TOO_MANY_KEYS
         console.log('✅ Database synced (altered).');
 
         // Seed Initial Settings if not exist
@@ -35,6 +35,34 @@ async function initializeDatabase() {
                 description: 'Enable SMS Two-Factor Authentication during registration'
             });
             console.log('Initialized default settings.');
+        }
+
+        // Seed Stripe Configuration
+        const stripePublicKey = process.env.STRIPE_PUBLIC_KEY;
+        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+        if (stripePublicKey) {
+            const pubKeySetting = await Setting.findOne({ where: { key: 'stripe_public_key' } });
+            if (!pubKeySetting) {
+                await Setting.create({
+                    key: 'stripe_public_key',
+                    value: stripePublicKey,
+                    description: 'Stripe Public Key'
+                });
+                console.log('✅ Seeded Stripe Public Key.');
+            }
+        }
+
+        if (stripeSecretKey) {
+            const secretKeySetting = await Setting.findOne({ where: { key: 'stripe_secret_key' } });
+            if (!secretKeySetting) {
+                await Setting.create({
+                    key: 'stripe_secret_key',
+                    value: stripeSecretKey,
+                    description: 'Stripe Secret Key'
+                });
+                console.log('✅ Seeded Stripe Secret Key.');
+            }
         }
 
         // 3. Seed Admin User

@@ -90,7 +90,7 @@ import { environment } from '../../../../../environments/environment';
                                   <p class="text-xs text-gray-500 mb-4">{{ lockedMessage() }}</p>
                                   <div class="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg">
                                       <i class="fas fa-clock text-gray-400 text-xs"></i>
-                                      <span class="text-xs font-mono font-bold text-gray-600">Available in {{ availableInMinutes() }} mins</span>
+                                      <span class="text-xs font-mono font-bold text-gray-600">{{ availabilityText() }}</span>
                                   </div>
                               </div>
                            } @else if (qrCodeData()) {
@@ -193,6 +193,24 @@ export class TicketViewComponent implements OnInit, OnDestroy {
   dynamicStatus = signal<'static' | 'dynamic' | 'locked'>('static');
   lockedMessage = signal<string>('');
   availableInMinutes = signal<number>(0);
+
+  availabilityText = computed(() => {
+    const mins = this.availableInMinutes();
+    const lang = this.currentLang();
+    const oneDay = 1440; // 24 * 60
+
+    if (mins >= oneDay) {
+      const days = Math.floor(mins / oneDay);
+      if (lang === 'es') return `Disponible en ${days} día${days !== 1 ? 's' : ''}`;
+      return `Available in ${days} day${days !== 1 ? 's' : ''}`;
+    } else {
+      const hours = Math.floor(mins / 60);
+      const m = mins % 60;
+      const mStr = m < 10 ? `0${m}` : `${m}`;
+      if (lang === 'es') return `Disponible en ${hours}h ${mStr}m`;
+      return `Available in ${hours}h ${mStr}m`;
+    }
+  });
 
   ngOnInit() {
     const orderId = this.route.snapshot.paramMap.get('id');
