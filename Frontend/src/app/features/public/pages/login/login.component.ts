@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from '../../../../../environments/environment';
@@ -88,8 +88,17 @@ export class LoginComponent {
   password = '';
   errorMessage = '';
   environment = environment;
+  returnUrl: string = '/';
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
+
+  ngOnInit() {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+  }
 
   login() {
     this.auth.login({ email: this.email, password: this.password }).subscribe({
@@ -100,20 +109,28 @@ export class LoginComponent {
     });
   }
 
-  ngOnInit() {
-    // Initialize Google Sign In
+  ngAfterViewInit() {
+    this.renderGoogleButton();
+  }
+
+  renderGoogleButton() {
     // @ts-ignore
     if (typeof google !== 'undefined' && environment.googleClientId !== 'YOUR_GOOGLE_CLIENT_ID') {
-      // @ts-ignore
-      google.accounts.id.initialize({
-        client_id: environment.googleClientId,
-        callback: (response: any) => this.handleGoogleCredential(response)
-      });
-      // @ts-ignore
-      google.accounts.id.renderButton(
-        document.getElementById("google-btn-login"),
-        { theme: "outline", size: "large", width: "100%" }
-      );
+      const btnEl = document.getElementById("google-btn-login");
+      if (btnEl) {
+        // @ts-ignore
+        google.accounts.id.initialize({
+          client_id: environment.googleClientId,
+          callback: (response: any) => this.handleGoogleCredential(response)
+        });
+        // @ts-ignore
+        google.accounts.id.renderButton(
+          btnEl,
+          { theme: "outline", size: "large", width: "100%" }
+        );
+      }
+    } else {
+      setTimeout(() => this.renderGoogleButton(), 500);
     }
   }
 
@@ -170,7 +187,9 @@ export class LoginComponent {
   }
 
   private handleSuccess(res: any) {
-    if (res.user.role === 'admin') {
+    if (this.returnUrl && this.returnUrl !== '/') {
+      this.router.navigateByUrl(this.returnUrl);
+    } else if (res.user.role === 'admin') {
       this.router.navigate(['/admin/dashboard']);
     } else {
       this.router.navigate(['/']);

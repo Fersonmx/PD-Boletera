@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { EventService, Event, Ticket } from '../../../../core/services/event.service';
 import { OrderService, OrderItem } from '../../../../core/services/order.service';
@@ -19,7 +19,7 @@ import { environment } from '../../../../../environments/environment';
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
       </div>
     } @else if (event()) {
-      <div class="bg-white min-h-screen pb-12">
+      <div class="bg-white min-h-screen pb-28 lg:pb-12">
         <!-- Header / Hero (Redesigned) -->
         <div class="relative bg-black overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-32">
           <!-- Background Effects -->
@@ -107,53 +107,76 @@ import { environment } from '../../../../../environments/environment';
                     </div>
 
                     <!-- Map Container -->
-                    <div class="relative w-full h-[500px] bg-gray-100 overflow-hidden cursor-move border-b border-gray-200"
+                    <div class="relative w-full h-[350px] sm:h-[450px] md:h-[550px] bg-gray-50 overflow-hidden cursor-move border-b border-gray-200"
                          (mousedown)="startPan($event)"
                          (mousemove)="pan($event)"
                          (mouseup)="endPan()"
                          (mouseleave)="endPan()"
+                         (touchstart)="startPanTouch($event)"
+                         (touchmove)="panTouch($event)"
+                         (touchend)="endPan()"
                          (wheel)="onWheel($event)"
                          (contextmenu)="$event.preventDefault()">
                          
                         <!-- Controls -->
-                         <div class="absolute top-4 right-4 z-30 flex flex-col gap-2 bg-white rounded-lg shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <button (click)="zoomIn()" class="p-2 hover:bg-gray-100 rounded text-gray-600" title="Zoom In"><i class="fas fa-plus"></i></button>
-                            <button (click)="zoomOut()" class="p-2 hover:bg-gray-100 rounded text-gray-600" title="Zoom Out"><i class="fas fa-minus"></i></button>
-                            <button (click)="resetView()" class="p-2 hover:bg-gray-100 rounded text-gray-600" title="Reset"><i class="fas fa-compress"></i></button>
+                         <div class="absolute top-4 right-4 z-30 flex flex-col gap-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-gray-100">
+                            <button (click)="zoomIn()" class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-700 transition-colors" title="Zoom In"><i class="fas fa-plus"></i></button>
+                            <button (click)="zoomOut()" class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-700 transition-colors" title="Zoom Out"><i class="fas fa-minus"></i></button>
+                            <button (click)="resetView()" class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-700 transition-colors" title="Reset"><i class="fas fa-compress"></i></button>
                          </div>
                     
                         <!-- Scrollable Layout -->
                         <div [style.transform]="'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoomLevel + ')'" 
-                             class="w-full h-full origin-top-left transition-transform duration-75 will-change-transform flex items-center justify-center">
+                             class="w-full h-full origin-center transition-transform duration-75 will-change-transform flex items-center justify-center p-2 sm:p-4">
                              
-                             <div class="relative" style="max-width: none;"> 
-                                 <!-- Background Image -->
+                             <div class="relative w-full max-w-5xl flex items-center justify-center"> 
+                                 <!-- Hidden Image just to calculate natural dimensions for viewBox -->
                                  @if (event()?.VenueLayout?.imageUrl) {
                                     <img [src]="event()?.VenueLayout?.imageUrl" 
                                          (load)="onImageLoad($event)"
-                                         class="block max-w-none h-auto select-none pointer-events-none"
-                                         style="min-width: 100%;"> 
+                                         (error)="onImageError($event)"
+                                         class="hidden"> 
                                  }
                                 
-                                <svg [attr.viewBox]="mapViewBox()" class="absolute inset-0 w-full h-full z-10">
+                                <svg #mapSvg [attr.viewBox]="mapViewBox()" preserveAspectRatio="xMidYMid meet" class="w-full h-auto drop-shadow-md z-10 transition-all duration-300 overflow-visible">
+                                     <!-- Render image natively inside the SVG to enforce an unbreakable 1:1 scale lock -->
+                                     @if (mapViewBox() !== '0 0 500 500' && event()?.VenueLayout?.imageUrl) {
+                                         <image [attr.href]="event()?.VenueLayout?.imageUrl" [attr.width]="imageWidth()" [attr.height]="imageHeight()" preserveAspectRatio="xMidYMid meet" />
+                                     }
                                      @for (section of event()?.VenueLayout?.sections; track section.id) {
                                         @if (section.visualData) {
                                             <path [attr.d]="section.visualData" 
                                                   (click)="onSectionClick(section)"
+                                                  (mouseenter)="hoveredSection.set(section)"
+                                                  (mouseleave)="hoveredSection.set(null)"
+                                                  (touchstart)="hoveredSection.set(section)"
                                                   [class]="getSectionClass(section)"
-                                                  class="transition-all duration-300 stroke-white stroke-2 pointer-events-auto">
-                                                  @if (getSectionTooltip(section)) {
-                                                      <title>{{ getSectionTooltip(section) }}</title>
-                                                  }
+                                                  class="transition-all duration-300 stroke-white stroke-[3px] pointer-events-auto">
                                             </path>
                                         }
                                      }
                                 </svg>
                              </div>
                         </div>
+
+                        <!-- Elegant Fixed Tooltip -->
+                        @if (hoveredSection() && getTicketForSection(hoveredSection()!.id)) {
+                           <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-40 px-6 py-3 bg-gray-900/95 backdrop-blur-md text-white rounded-full shadow-2xl border border-white/10 flex items-center gap-5 animate-fadeIn pointer-events-none transition-all duration-200 min-w-max">
+                               <div>
+                                   <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">{{ hoveredSection()?.name }}</p>
+                                   <p class="text-lg font-black text-pink-400 leading-none">{{ getTicketForSection(hoveredSection()!.id)?.price | currency:(event()?.currency || 'USD'):'symbol':'1.0-0':currentLang() }}</p>
+                               </div>
+                               <div class="w-px h-8 bg-white/20"></div>
+                               <div class="text-right">
+                                   <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold hidden sm:block mb-0.5">{{ 'EVENT_DETAIL.AVAILABLE' | translate }}</p>
+                                   <p class="text-sm font-bold text-green-400 leading-none mt-1 sm:mt-0">{{ getTicketForSection(hoveredSection()!.id)?.available }} <i class="fas fa-ticket-alt ml-1 opacity-70 text-xs"></i></p>
+                               </div>
+                           </div>
+                        }
+
                     </div>
-                     <p class="text-center text-xs text-gray-400 p-2 bg-gray-50 border-t border-gray-100">
-                        <i class="fas fa-hand-pointer mr-1"></i> {{ 'EVENT_DETAIL.MAP_INSTRUCTIONS' | translate }}
+                     <p class="text-center text-xs text-gray-400 p-3 bg-gray-50 border-t border-gray-100 font-medium tracking-wide">
+                        <i class="fas fa-hand-pointer mr-1 text-pink-400"></i> {{ 'EVENT_DETAIL.MAP_INSTRUCTIONS' | translate }}
                      </p>
                 </div>
              }
@@ -213,58 +236,85 @@ import { environment } from '../../../../../environments/environment';
 
           <!-- Checkout / Info Sidebar -->
           <div class="lg:col-span-1">
-              <div class="bg-gray-50 rounded-xl p-6 sticky top-24 shadow-sm border border-gray-200">
-              <h3 class="text-lg font-bold text-gray-900 mb-4">{{ 'EVENT_DETAIL.SUMMARY' | translate }}</h3>
-              
-              <!-- Cart Items -->
-              @if (totalItems() > 0) {
-                 <div class="space-y-3 mb-6 border-b border-gray-200 pb-4">
-                    @for (item of cartItems(); track item.ticketId) {
-                        @if (item.quantity > 0) {
-                            <div class="flex justify-between text-sm group">
-                                <div>
-                                    <span class="block font-medium text-gray-900">{{ getTicketName(item.ticketId) }}</span>
-                                    <span class="text-xs text-gray-500">{{ 'EVENT_DETAIL.QTY' | translate }}: {{item.quantity}}</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="font-bold">{{ getTicketPrice(item.ticketId) * item.quantity | currency:(event()?.currency || 'USD'):'symbol':'1.0-0':currentLang() }}</span>
-                                    <button (click)="removeItem(item.ticketId)" class="block text-xs text-pink-500 hover:underline ml-auto mt-1">{{ 'EVENT_DETAIL.REMOVE' | translate }}</button>
-                                </div>
-                            </div>
-                        }
-                    }
-                 </div>
-                 
-                 <div class="flex justify-between text-xl font-bold text-gray-900 mb-6">
-                    <span>{{ 'EVENT_DETAIL.TOTAL' | translate }}</span>
-                    <span>{{ totalPrice() | currency:(event()?.currency || 'USD'):'symbol':'1.0-0':currentLang() }}</span>
-                 </div>
-
-                 <button (click)="startCheckout()" [disabled]="isProcessing()" class="w-full py-3 bg-pink-600 text-white rounded-lg font-bold hover:bg-pink-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-pink-200 transform hover:-translate-y-0.5 active:translate-y-0">
-                    {{ isProcessing() ? ('EVENT_DETAIL.CHECKOUT_PROCESSING' | translate) : ('EVENT_DETAIL.CHECKOUT' | translate) }}
-                 </button>
-              } @else {
-                  <div class="text-center py-8">
-                       <i class="fas fa-ticket-alt text-4xl text-gray-300 mb-3"></i>
-                       <p class="text-gray-500 text-sm mb-4">{{ 'EVENT_DETAIL.SELECT_TO_PROCEED' | translate }}</p>
+              <div class="bg-white lg:bg-gray-50 rounded-t-3xl lg:rounded-xl p-6 shadow-[0_-15px_40px_rgba(0,0,0,0.15)] lg:shadow-sm border-t lg:border border-gray-200 transition-all duration-300 z-50"
+                   [ngClass]="{
+                     'fixed bottom-0 left-0 w-full': totalItems() > 0,
+                     'sticky top-24 relative lg:static': totalItems() === 0,
+                     'lg:relative lg:sticky lg:top-24 lg:w-auto lg:shadow-sm lg:rounded-xl lg:border-t-0': totalItems() > 0
+                   }">
+                  
+                  <div class="flex justify-between items-center lg:items-start lg:block cursor-pointer lg:cursor-default" (click)="isMobileCartOpen.set(!isMobileCartOpen())">
+                      <h3 class="text-lg font-bold text-gray-900 mb-0 lg:mb-4 flex items-center gap-2">
+                          {{ 'EVENT_DETAIL.SUMMARY' | translate }}
+                          @if (totalItems() > 0) {
+                              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-600 text-white text-xs lg:hidden shadow-sm">{{ totalItems() }}</span>
+                          }
+                      </h3>
+                      @if (totalItems() > 0) {
+                          <div class="lg:hidden flex items-center gap-4">
+                              <span class="font-black text-xl text-pink-600">{{ totalPrice() | currency:(event()?.currency || 'USD'):'symbol':'1.0-0':currentLang() }}</span>
+                              <button (click)="startCheckout(); $event.stopPropagation()" class="px-6 py-2 bg-pink-600 text-white rounded-full font-bold shadow-lg active:scale-95 transition-transform uppercase tracking-widest text-[10px] sm:text-xs">
+                                  {{ isProcessing() ? ('EVENT_DETAIL.CHECKOUT_PROCESSING' | translate) : ('EVENT_DETAIL.CHECKOUT' | translate) }}
+                              </button>
+                              <i class="fas fa-chevron-up text-gray-400 text-sm transform transition-transform" [class.rotate-180]="isMobileCartOpen()"></i>
+                          </div>
+                      }
                   </div>
-                  <button disabled class="w-full py-3 bg-gray-200 text-gray-400 rounded-lg font-bold cursor-not-allowed">
-                    {{ 'EVENT_DETAIL.CHECKOUT' | translate }}
-                  </button>
-              }
-              
-              <div class="mt-6 pt-4 border-t border-gray-200">
-                 <div class="flex items-center gap-2 justify-center text-gray-400 mb-2">
-                    <i class="fab fa-cc-visa text-2xl"></i>
-                    <i class="fab fa-cc-mastercard text-2xl"></i>
-                    <i class="fab fa-cc-amex text-2xl"></i>
-                 </div>
-                 <p class="text-xs text-gray-500 text-center">
-                   {{ 'EVENT_DETAIL.SECURE_CHECKOUT' | translate }} <br>
-                   {{ 'EVENT_DETAIL.BUYER_GUARANTEE' | translate }}
-                 </p>
+                  
+                  <div [class.hidden]="totalItems() > 0 && !isMobileCartOpen()" class="lg:block mt-6 lg:mt-0">
+                      @if (totalItems() > 0) {
+                         <div class="max-h-48 overflow-y-auto lg:max-h-none space-y-3 mb-6 border-b border-gray-100 pb-4 no-scrollbar">
+                            @for (item of cartItems(); track item.ticketId) {
+                                @if (item.quantity > 0) {
+                                    <div class="flex justify-between items-center text-sm group bg-gray-50/80 p-3 rounded-xl border border-gray-100">
+                                        <div>
+                                            <span class="block font-bold text-gray-900 leading-tight">{{ getTicketName(item.ticketId) }}</span>
+                                            <div class="flex items-center gap-3 mt-1.5">
+                                                <span class="text-xs text-gray-500 font-medium">{{ 'EVENT_DETAIL.QTY' | translate }}: <span class="text-gray-900">{{item.quantity}}</span></span>
+                                                <button (click)="removeItem(item.ticketId)" class="text-[10px] text-pink-500 hover:text-pink-700 font-bold uppercase tracking-wider flex items-center gap-1"><i class="fas fa-times"></i> {{ 'EVENT_DETAIL.REMOVE' | translate }}</button>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="font-black text-gray-900 text-base">{{ getTicketPrice(item.ticketId) * item.quantity | currency:(event()?.currency || 'USD'):'symbol':'1.0-0':currentLang() }}</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                         </div>
+                         
+                         <div class="hidden lg:flex justify-between items-center text-xl font-black text-gray-900 mb-6">
+                            <span class="uppercase tracking-tight">{{ 'EVENT_DETAIL.TOTAL' | translate }}</span>
+                            <span class="text-2xl text-pink-600">{{ totalPrice() | currency:(event()?.currency || 'USD'):'symbol':'1.0-0':currentLang() }}</span>
+                         </div>
+            
+                         <button (click)="startCheckout()" [disabled]="isProcessing()" class="hidden lg:block w-full py-4 bg-pink-600 text-white rounded-xl font-black uppercase tracking-wider hover:bg-pink-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-pink-200 transform hover:-translate-y-1 active:translate-y-0 text-lg">
+                            {{ isProcessing() ? ('EVENT_DETAIL.CHECKOUT_PROCESSING' | translate) : ('EVENT_DETAIL.CHECKOUT' | translate) }}
+                         </button>
+                      } @else {
+                          <div class="text-center py-10 px-4 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
+                               <div class="w-16 h-16 mx-auto bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+                                   <i class="fas fa-ticket-alt text-2xl text-gray-300"></i>
+                               </div>
+                               <p class="text-gray-500 text-sm font-medium">{{ 'EVENT_DETAIL.SELECT_TO_PROCEED' | translate }}</p>
+                          </div>
+                          <button disabled class="w-full mt-6 py-4 bg-gray-100 text-gray-400 rounded-xl font-black uppercase tracking-wider cursor-not-allowed hidden lg:block">
+                            {{ 'EVENT_DETAIL.CHECKOUT' | translate }}
+                          </button>
+                      }
+                      
+                      <div class="mt-6 pt-4 border-t border-gray-100">
+                         <div class="flex items-center gap-3 justify-center text-gray-300 mb-3 grayscale opacity-70">
+                            <i class="fab fa-cc-visa text-3xl hover:grayscale-0 hover:text-blue-600 transition-all"></i>
+                            <i class="fab fa-cc-mastercard text-3xl hover:grayscale-0 hover:text-orange-500 transition-all"></i>
+                            <i class="fab fa-cc-amex text-3xl hover:grayscale-0 hover:text-blue-500 transition-all"></i>
+                         </div>
+                         <p class="text-[10px] text-gray-400 text-center font-medium uppercase tracking-widest leading-relaxed hidden lg:block">
+                           {{ 'EVENT_DETAIL.SECURE_CHECKOUT' | translate }} <br>
+                           {{ 'EVENT_DETAIL.BUYER_GUARANTEE' | translate }}
+                         </p>
+                      </div>
+                  </div>
               </div>
-            </div>
           </div>
 
         </div>
@@ -275,13 +325,18 @@ import { environment } from '../../../../../environments/environment';
   `,
   styles: [`
     path[data-tooltip] { position: relative; }
-    .cursor-move { cursor: move; }
+    .cursor-move { cursor: move; touch-action: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   `]
 })
 export class EventDetailComponent implements OnInit {
   event = signal<Event | null>(null);
   isLoading = signal<boolean>(true);
   currentLang = signal<string>('es');
+
+  // Hover Tooltip
+  hoveredSection = signal<VenueSection | null>(null);
 
   // Cart State
   cart = signal<{ ticketId: number; name: string; price: number; quantity: number }[]>([]);
@@ -291,6 +346,9 @@ export class EventDetailComponent implements OnInit {
   guestForm = { name: '', email: '' };
   isProcessing = signal(false);
 
+  // Mobile Floating Cart State
+  isMobileCartOpen = signal(false);
+
   // Map Zoom/Pan State
   zoomLevel = 1;
   panX = 0;
@@ -299,10 +357,18 @@ export class EventDetailComponent implements OnInit {
   lastMouseX = 0;
   lastMouseY = 0;
   mapViewBox = signal('0 0 500 500');
+  mapAspectRatio = signal('1 / 1'); // Keep aspect ratio synced
+  imageWidth = signal(500);
+  imageHeight = signal(500);
+
+  @ViewChild('mapSvg') mapSvgElement!: ElementRef<SVGElement>;
 
   getImageUrl(path: string | undefined): string {
     if (!path) return '';
     if (path.startsWith('http')) return path;
+    if (path.startsWith('/uploads')) {
+      path = '/api' + path;
+    }
     const baseUrl = environment.apiUrl.replace('/api', '');
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
     return `${baseUrl}${normalizedPath}`;
@@ -311,10 +377,49 @@ export class EventDetailComponent implements OnInit {
   onImageLoad(event: any) {
     const img = event.target as HTMLImageElement;
     // Set viewBox matches natural dimensions
-    this.mapViewBox.set(`0 0 ${img.naturalWidth} ${img.naturalHeight}`);
+    let w = img.naturalWidth || 800;
+    let h = img.naturalHeight || 600;
+
+    this.imageWidth.set(w);
+    this.imageHeight.set(h);
+    this.mapViewBox.set(`0 0 ${w} ${h}`);
+    this.mapAspectRatio.set(`${w} / ${h}`);
+
+    // Wait for angular to render paths, then recalculate to include them
+    setTimeout(() => this.recalculateBoundingBox(w, h), 100);
+  }
+
+  recalculateBoundingBox(imgW: number, imgH: number) {
+    try {
+      if (!this.mapSvgElement) return;
+      const svg = this.mapSvgElement.nativeElement as any;
+      if (typeof svg.getBBox === 'function') {
+        const bbox = svg.getBBox();
+        if (bbox && bbox.width > 0) {
+          // Merge Image dimensions and Bounding Box of all paths
+          const minX = Math.min(0, bbox.x);
+          const minY = Math.min(0, bbox.y);
+          const maxX = Math.max(imgW, bbox.x + bbox.width);
+          const maxY = Math.max(imgH, bbox.y + bbox.height);
+
+          const width = maxX - minX;
+          const height = maxY - minY;
+
+          if (width > 0 && height > 0) {
+            // Apply padding so edges don't get strictly cut off
+            const pad = Math.max(width, height) * 0.05;
+            this.mapViewBox.set(`${minX - pad} ${minY - pad} ${width + pad * 2} ${height + pad * 2}`);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Could not calculate exact SVG Bounding box', e);
+    }
   }
 
   onImageError(event: any) {
+    // If image fails, fallback to rendering just the sections bounds
+    setTimeout(() => this.recalculateBoundingBox(800, 600), 100);
     event.target.src = 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1950&q=80';
   }
 
@@ -396,12 +501,12 @@ export class EventDetailComponent implements OnInit {
   getSectionClass(section: VenueSection): string {
     const ticket = this.getTicketForSection(section.id);
     const inCart = ticket && this.getQty(ticket.id) > 0;
-    if (inCart) return 'fill-pink-600 hover:fill-pink-700 cursor-pointer opacity-60';
+    if (inCart) return 'fill-pink-500 opacity-90 stroke-[3px] stroke-pink-700 drop-shadow-md';
 
     if (!ticket || ticket.available === 0) {
-      return 'fill-gray-300 cursor-not-allowed opacity-60';
+      return 'fill-gray-300 cursor-not-allowed opacity-50 relative';
     }
-    return 'fill-green-500 hover:fill-green-600 cursor-pointer opacity-60';
+    return 'fill-green-500 hover:fill-green-400 cursor-pointer opacity-70 relative';
   }
 
   getSectionTooltip(section: VenueSection): string | null {
@@ -432,8 +537,6 @@ export class EventDetailComponent implements OnInit {
     this.isPanning = true;
     this.lastMouseX = event.clientX;
     this.lastMouseY = event.clientY;
-    // Don't prevent default immediately to allow click events to propagate if no drag occurs
-    // event.preventDefault(); 
   }
 
   pan(event: MouseEvent) {
@@ -459,10 +562,61 @@ export class EventDetailComponent implements OnInit {
   endPan() {
     this.isPanning = false;
     if (this.isDragging) {
-      // If it was a drag, delay resetting to block the subsequent click
       setTimeout(() => this.isDragging = false, 50);
     }
-    // If it wasn't a drag, isDragging is already false, allowing the click to pass
+  }
+
+  // --- Touch Support for Mobile Dragging ---
+  lastTouchDistance = 0;
+  lastTouchMidX = 0;
+  lastTouchMidY = 0;
+
+  startPanTouch(event: TouchEvent) {
+    if (event.touches.length === 2) {
+      if (event.cancelable) event.preventDefault();
+
+      this.isPanning = true;
+      const t1 = event.touches[0];
+      const t2 = event.touches[1];
+
+      this.lastTouchDistance = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      this.lastTouchMidX = (t1.clientX + t2.clientX) / 2;
+      this.lastTouchMidY = (t1.clientY + t2.clientY) / 2;
+    }
+  }
+
+  panTouch(event: TouchEvent) {
+    if (event.touches.length === 2 && this.isPanning) {
+      if (event.cancelable) event.preventDefault();
+
+      const t1 = event.touches[0];
+      const t2 = event.touches[1];
+
+      const currentDistance = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      const currentMidX = (t1.clientX + t2.clientX) / 2;
+      const currentMidY = (t1.clientY + t2.clientY) / 2;
+
+      const dx = currentMidX - this.lastTouchMidX;
+      const dy = currentMidY - this.lastTouchMidY;
+
+      if (!this.isDragging && (Math.hypot(dx, dy) > 3 || Math.abs(currentDistance - this.lastTouchDistance) > 5)) {
+        this.isDragging = true;
+      }
+
+      if (this.isDragging) {
+        this.panX += dx;
+        this.panY += dy;
+
+        if (this.lastTouchDistance > 0 && Math.abs(currentDistance - this.lastTouchDistance) > 2) {
+          const zoomFactor = currentDistance / this.lastTouchDistance;
+          this.applyZoom(zoomFactor);
+        }
+
+        this.lastTouchDistance = currentDistance;
+        this.lastTouchMidX = currentMidX;
+        this.lastTouchMidY = currentMidY;
+      }
+    }
   }
 
   onWheel(event: WheelEvent) {

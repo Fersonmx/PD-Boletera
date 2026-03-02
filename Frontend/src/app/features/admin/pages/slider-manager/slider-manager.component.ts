@@ -98,18 +98,32 @@ import { environment } from '../../../../../environments/environment';
 
       <!-- List -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (slide of slides(); track slide.id) {
-              <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
-                  <div class="h-40 bg-gray-200 relative">
-                      <img [src]="getImageUrl(slide.imageUrl || slide.event?.imageUrl) || 'assets/placeholder-event.jpg'" class="w-full h-full object-cover">
-                      <div class="absolute top-2 right-2 flex gap-1">
-                          <button (click)="deleteSlide(slide.id)" class="bg-white/90 p-2 rounded-full text-red-600 hover:bg-red-50 hover:text-red-700 shadow-sm"><i class="fas fa-trash"></i></button>
+          @for (slide of slides(); track slide.id; let i = $index) {
+              <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group cursor-move"
+                   draggable="true" 
+                   (dragstart)="onDragStart(i)" 
+                   (dragover)="onDragOver($event)" 
+                   (drop)="onDrop($event, i)"
+                   [class.opacity-50]="draggedIndex === i"
+                   [class.border-pink-500]="dragOverIndex === i"
+                   [class.border-2]="dragOverIndex === i"
+                   (dragenter)="dragOverIndex = i"
+                   (dragleave)="dragOverIndex = null"
+                   (dragend)="draggedIndex = null; dragOverIndex = null">
+                  
+                  <div class="h-40 bg-gray-200 relative pointer-events-none">
+                      <img [src]="getImageUrl(slide.imageUrl || slide.event?.imageUrl) || 'assets/placeholder-event.jpg'" class="w-full h-full object-cover select-none">
+                      <div class="absolute top-2 right-2 flex gap-1 pointer-events-auto">
+                          <button (click)="deleteSlide(slide.id); $event.stopPropagation()" class="bg-white/90 p-2 rounded-full text-red-600 hover:bg-red-50 hover:text-red-700 shadow-sm"><i class="fas fa-trash"></i></button>
                       </div>
-                      <div class="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold">
+                      <div class="absolute top-2 left-2 bg-white/90 p-2 rounded-full text-gray-400 shadow-sm pointer-events-auto cursor-move">
+                          <i class="fas fa-grip-vertical"></i>
+                      </div>
+                      <div class="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold pointer-events-auto">
                           Order: {{ slide.order }}
                       </div>
                   </div>
-                  <div class="p-4">
+                  <div class="p-4 pointer-events-none">
                       <h3 class="font-bold text-gray-900 truncate">{{ slide.title || slide.event?.title }}</h3>
                       <p class="text-xs text-gray-500 truncate">{{ slide.subtitle || (slide.event?.date | date:'mediumDate') }}</p>
                   </div>
@@ -136,6 +150,10 @@ export class SliderManagerComponent implements OnInit {
     categories = signal<any[]>([]);
     selectedCategoryId: number | null = null;
     isBulkLoading = false;
+
+    // Drag and Drop state
+    draggedIndex: number | null = null;
+    dragOverIndex: number | null = null;
 
     constructor(
         private contentService: ContentService,
@@ -268,8 +286,69 @@ export class SliderManagerComponent implements OnInit {
         if (!path) return '';
         if (path.startsWith('http')) return path;
         // baseUrl is http://localhost:3001
+        if (path.startsWith('/uploads')) {
+            path = '/api' + path;
+        }
         const baseUrl = environment.apiUrl.replace('/api', '');
         const normalizedPath = path.startsWith('/') ? path : `/${path}`;
         return `${baseUrl}${normalizedPath}`;
     }
+
+    // --- Drag and Drop Logic ---
+
+    onDragStart(index: number) {
+        this.draggedIndex = index;
+    }
+
+    onDragOver(event: DragEvent) {
+        // Prevent default to allow drop
+        event.preventDefault();
+        event.dataTransfer!.dropEffect = 'move';
+    }
+
+    onDrop(event: DragEvent, dropIndex: number) {
+        event.preventDefault();
+
+        if (this.draggedIndex === null || this.draggedIndex === dropIndex) {
+            this.draggedIndex = null;
+            this.dragOverIndex = null;
+            return;
+        }
+
+        const items = [...this.slides()];
+        const [draggedItem] = items.splice(this.draggedIndex, 1);
+        items.splice(dropIndex, 0, draggedItem);
+
+        // Update the order locally
+        items.forEach((item, index) => {
+            item.order = index + 1;
+        });
+
+        this.slides.set(items);
+        this.draggedIndex = null;
+        this.dragOverIndex = null;
+
+        // Save order to backend
+        this.saveOrder(items);
+    }
+
+    private saveOrder(items: any[]) {
+        let completed = 0;
+        let errors = 0;
+
+        items.forEach(item => {
+            // Update each item's order 
+            this.contentService.updateHeroSlide(item.id, { order: item.order }).subscribe({
+                next: () => {
+                    completed++;
+                    // Assuming we don't need to do anything if updated successfully since it's fast
+                },
+                error: () => {
+                    errors++;
+                    console.error('Failed to update order for slide', item.id);
+                }
+            });
+        });
+    }
+
 }

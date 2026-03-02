@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -62,13 +62,26 @@ import { environment } from '../../../../../environments/environment';
 
                     <!-- Google Sign In -->
                     <div class="mt-6">
-                        <div id="google-btn" class="w-full flex justify-center"></div>
-                        <!-- Fallback/Mock Button if Real Load Fails or is mocked -->
-                        <button *ngIf="false && !environment.production" type="button" (click)="signInWithGoogle()" class="mt-2 w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors">
-                            <span class="mr-2 text-xs text-gray-400">(Mock)</span>
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 mr-2">
-                            Sign up with Google
-                        </button>
+                        <div class="relative">
+                          <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                          </div>
+                          <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">
+                              O continua con
+                            </span>
+                          </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <div id="google-btn" class="w-full flex justify-center"></div>
+                            <!-- Fallback/Mock Button if Real Load Fails or is mocked -->
+                            <button *ngIf="false && !environment.production" type="button" (click)="signInWithGoogle()" class="mt-2 w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors">
+                                <span class="mr-2 text-xs text-gray-400">(Mock)</span>
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 mr-2">
+                                Sign up with Google
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -155,20 +168,29 @@ export class RegisterComponent {
     });
   }
 
-  ngOnInit() {
-    // Initialize Google Sign In
+  ngAfterViewInit() {
+    this.renderGoogleButton();
+  }
+
+  renderGoogleButton() {
     // @ts-ignore
     if (typeof google !== 'undefined' && environment.googleClientId !== 'YOUR_GOOGLE_CLIENT_ID') {
-      // @ts-ignore
-      google.accounts.id.initialize({
-        client_id: environment.googleClientId,
-        callback: (response: any) => this.handleGoogleCredential(response)
-      });
-      // @ts-ignore
-      google.accounts.id.renderButton(
-        document.getElementById("google-btn"),
-        { theme: "outline", size: "large", width: "100%" }
-      );
+      const btnEl = document.getElementById("google-btn");
+      if (btnEl) {
+        // @ts-ignore
+        google.accounts.id.initialize({
+          client_id: environment.googleClientId,
+          callback: (response: any) => this.handleGoogleCredential(response)
+        });
+        // @ts-ignore
+        google.accounts.id.renderButton(
+          btnEl,
+          { theme: "outline", size: "large", width: "100%", text: "signup_with" }
+        );
+      }
+    } else {
+      // Retry if script is not yet loaded
+      setTimeout(() => this.renderGoogleButton(), 500);
     }
   }
 

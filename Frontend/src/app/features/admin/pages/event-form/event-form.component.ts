@@ -54,7 +54,10 @@ import { environment } from '../../../../../environments/environment';
               </div>
 
               <div class="sm:col-span-3">
-                <label for="categoryId" class="block text-sm font-bold leading-6 text-gray-900 uppercase tracking-wide">Category</label>
+                <div class="flex items-center justify-between">
+                  <label for="categoryId" class="block text-sm font-bold leading-6 text-gray-900 uppercase tracking-wide">Category</label>
+                  <button type="button" (click)="showNewCategoryForm = !showNewCategoryForm" class="text-xs font-bold text-pink-600 hover:text-pink-800 uppercase">+ New Category</button>
+                </div>
                 <div class="mt-2">
                   <select [(ngModel)]="formData.categoryId" name="categoryId" id="categoryId" class="block w-full rounded-xl border-gray-300 py-3 text-gray-900 shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 sm:text-sm md:text-base font-medium">
                     <option [ngValue]="null">Select a Category</option>
@@ -63,6 +66,12 @@ import { environment } from '../../../../../environments/environment';
                     }
                   </select>
                 </div>
+                @if (showNewCategoryForm) {
+                    <div class="mt-3 flex items-center gap-2 p-3 bg-pink-50 rounded-xl border border-pink-100">
+                        <input [(ngModel)]="newCategoryName" name="newCategoryName" placeholder="Category Name" class="block w-full rounded-lg border-gray-300 py-2 text-sm focus:ring-pink-500 focus:border-pink-500">
+                        <button type="button" (click)="createCategory()" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-pink-700 whitespace-nowrap shadow-sm">Save</button>
+                    </div>
+                }
               </div>
 
               <div class="sm:col-span-3">
@@ -439,6 +448,10 @@ export class EventFormComponent implements OnInit {
   // tierLimits: { [tierIndex]: { [sectionId]: limit (number or null for unlimited) } }
   tierLimits: { [key: number]: { [key: number]: number | null } } = { 0: {} };
 
+  // Category Management
+  showNewCategoryForm = false;
+  newCategoryName = '';
+
   // Ticket Management
   tickets = signal<Ticket[]>([]);
   showTicketForm = false;
@@ -680,6 +693,12 @@ export class EventFormComponent implements OnInit {
   getImageUrl(path: string): string {
     if (!path) return '';
     if (path.startsWith('http')) return path;
+    
+    // Auto-fix old database paths to ensure Nginx proxies them to Node
+    if (path.startsWith('/uploads')) {
+        path = '/api' + path;
+    }
+    
     const baseUrl = environment.apiUrl.replace('/api', '');
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
     return `${baseUrl}${normalizedPath}`;
@@ -792,5 +811,25 @@ export class EventFormComponent implements OnInit {
         error: (err) => alert('Failed to delete ticket')
       });
     }
+  }
+
+  createCategory() {
+    if (!this.newCategoryName || !this.newCategoryName.trim()) return;
+    const payload = {
+      name: this.newCategoryName,
+      slug: this.newCategoryName.toLowerCase().replace(/\s+/g, '-')
+    };
+
+    this.categoryService.createCategory(payload).subscribe({
+      next: (newCat) => {
+        // Update local list
+        this.categories.update(cats => [...cats, newCat]);
+        // Auto-select and hide form
+        this.formData.categoryId = newCat.id;
+        this.newCategoryName = '';
+        this.showNewCategoryForm = false;
+      },
+      error: (err) => alert('Failed to create category: ' + (err.error?.message || err.message))
+    });
   }
 }

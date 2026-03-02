@@ -222,6 +222,9 @@ export class EventsListComponent implements OnInit {
   getImageUrl(path: string | undefined): string {
     if (!path) return '';
     if (path.startsWith('http')) return path;
+    if (path.startsWith('/uploads')) {
+      path = '/api' + path;
+    }
     const baseUrl = environment.apiUrl.replace('/api', '');
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
     return `${baseUrl}${normalizedPath}`;

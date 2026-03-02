@@ -131,6 +131,9 @@ import { environment } from '../../../../../environments/environment';
                         <button (click)="tool = 'draw'" [class.bg-pink-600]="tool === 'draw'" class="p-2 rounded hover:bg-gray-700 transition" title="Draw Mode (P)">
                             <i class="fas fa-draw-polygon"></i>
                         </button>
+                        <button (click)="tool = 'move'" [class.bg-pink-600]="tool === 'move'" class="p-2 rounded hover:bg-gray-700 transition" title="Move Mode (M)">
+                            <i class="fas fa-arrows-alt"></i>
+                        </button>
                         <div class="h-4 w-px bg-gray-700 mx-1"></div>
                         <button (click)="zoomIn()" class="p-2 rounded hover:bg-gray-700 transition" title="Zoom In"><i class="fas fa-search-plus"></i></button>
                         <span class="text-xs font-mono w-12 text-center">{{ (zoomLevel * 100).toFixed(0) }}%</span>
@@ -229,7 +232,8 @@ import { environment } from '../../../../../environments/environment';
                                         <path [attr.d]="section.visualData" 
                                               [class.fill-pink-500]="selectedSection === section"
                                               class="fill-pink-500/30 stroke-pink-600 stroke-2 hover:fill-pink-500/60 cursor-pointer pointer-events-auto transition-colors"
-                                              (click)="selectSection(section); $event.stopPropagation()">
+                                              (click)="selectSection(section); $event.stopPropagation()"
+                                              (mousedown)="onSectionMouseDown($event, section)">
                                               <title>{{ section.name }} ({{ section.capacity }})</title>
                                         </path>
                                         <!-- Centered Label -->
@@ -324,12 +328,14 @@ import { environment } from '../../../../../environments/environment';
     `]
 })
 export class VenueFormComponent implements OnInit {
+    @ViewChild('canvasContainer') canvasContainer!: ElementRef;
+
     venue: Venue = { id: 0, name: '', address: '', city: '', capacity: 0, layouts: [] };
     isEditMode = false;
     activeLayout: VenueLayout | null = null;
 
     // Editor State
-    tool: 'pan' | 'draw' = 'pan';
+    tool: 'pan' | 'draw' | 'move' = 'pan';
     zoomLevel = 1;
     panX = 0;
     panY = 0;
@@ -343,8 +349,23 @@ export class VenueFormComponent implements OnInit {
     currentPoints: { x: number, y: number, isControl?: boolean }[] = [];
     cursorPos: { x: number, y: number } | null = null;
 
+    // Move State
+    movingSection: VenueSection | null = null;
+    moveStartX = 0;
+    moveStartY = 0;
+    originalPathData = '';
+
     // Selection State
     selectedSection: VenueSection | null = null;
+
+    // Map Dimensions State
+    mapViewBox = '0 0 500 500';
+
+    onImageLoad(event: any) {
+        const img = event.target as HTMLImageElement;
+        this.mapViewBox = `0 0 ${img.naturalWidth} ${img.naturalHeight}`;
+    }
+
 
     constructor(
         private venueService: VenueService,
@@ -393,6 +414,11 @@ export class VenueFormComponent implements OnInit {
     uploadImage(event: any, layout: VenueLayout) {
         const file = event.target.files[0];
         if (file) {
+            // Auto-parse SVG to extract sections
+            if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
+                this.parseSVGFileForSections(file, layout);
+            }
+
             const formData = new FormData();
             formData.append('image', file);
 
@@ -410,6 +436,82 @@ export class VenueFormComponent implements OnInit {
                 }
             });
         }
+    }
+
+    parseSVGFileForSections(file: File, layout: VenueLayout) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target?.result as string;
+            if (!text) return;
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'image/svg+xml');
+
+            const paths = doc.querySelectorAll('path');
+            const polygons = doc.querySelectorAll('polygon');
+            const rects = doc.querySelectorAll('rect');
+
+            let foundCount = 0;
+
+            const addExtractedSection = (pathData: string, idName: string) => {
+                // Ignore empty or invalid paths
+                if (!pathData || pathData.trim() === '') return;
+
+                if (!layout.sections) layout.sections = [];
+                layout.sections.push({
+                    name: idName || ('Imported Shape ' + (layout.sections.length + 1)),
+                    capacity: 100,
+                    visualData: pathData,
+                    layoutId: layout.id || 0
+                });
+                foundCount++;
+            };
+
+            // 1. Extract PATHS
+            paths.forEach((p, idx) => {
+                const d = p.getAttribute('d');
+                if (d) addExtractedSection(d, p.getAttribute('id') || p.getAttribute('name') || p.getAttribute('title') || `Path ${idx + 1}`);
+            });
+
+            // 2. Extract POLYGONS -> Convert to PATH
+            polygons.forEach((poly, idx) => {
+                const points = poly.getAttribute('points');
+                if (points) {
+                    const pts = points.trim().split(/[\s,]+/);
+                    let dStr = '';
+                    for (let i = 0; i < pts.length; i += 2) {
+                        if (pts[i] !== undefined && pts[i + 1] !== undefined) {
+                            dStr += (i === 0 ? 'M ' : ' L ') + pts[i] + ' ' + pts[i + 1];
+                        }
+                    }
+                    if (dStr) {
+                        dStr += ' Z';
+                        addExtractedSection(dStr, poly.getAttribute('id') || poly.getAttribute('name') || `Poly ${idx + 1}`);
+                    }
+                }
+            });
+
+            // 3. Extract RECTS -> Convert to PATH
+            rects.forEach((rect, idx) => {
+                // Ignore "100%" relative rects which are usually backgrounds
+                if (rect.getAttribute('width')?.includes('%') || rect.getAttribute('height')?.includes('%')) return;
+
+                const x = parseFloat(rect.getAttribute('x') || '0');
+                const y = parseFloat(rect.getAttribute('y') || '0');
+                const w = parseFloat(rect.getAttribute('width') || '0');
+                const h = parseFloat(rect.getAttribute('height') || '0');
+
+                if (w > 0 && h > 0) {
+                    const dStr = `M ${x} ${y} L ${x + w} ${y} L ${x + w} ${y + h} L ${x} ${y + h} Z`;
+                    addExtractedSection(dStr, rect.getAttribute('id') || rect.getAttribute('name') || `Rect ${idx + 1}`);
+                }
+            });
+
+            if (foundCount > 0) {
+                alert(`¡Se detectaron e importaron ${foundCount} formas automáticamente desde tu SVG!\n\nRevisa la lista de la izquierda y elimina aquellas que no sean zonas de venta (textos, fondos, decoraciones, etc).`);
+            }
+        };
+        reader.readAsText(file);
     }
 
     removeLayout(index: number) {
@@ -433,11 +535,9 @@ export class VenueFormComponent implements OnInit {
     // Coordinate Conversion used for drawing points relative to image origin
     getMapCoordinates(event: MouseEvent): { x: number, y: number } {
         // We need to subtract pan and divide by zoom to get "Image Space" coordinates
-        // Mouse Event is relative to 'canvasContainer' due to (mousedown) binding? 
-        // No, event.offsetX/Y gives coord relative to target. If target is SVG or Div, it helps.
         // Better: use clientX/Y and bounding rect of container.
 
-        const container = (event.currentTarget as HTMLElement).getBoundingClientRect();
+        const container = this.canvasContainer.nativeElement.getBoundingClientRect();
         const mouseX = event.clientX - container.left;
         const mouseY = event.clientY - container.top;
 
@@ -480,6 +580,65 @@ export class VenueFormComponent implements OnInit {
         }
     }
 
+    translatePathString(d: string, dx: number, dy: number): string {
+        const commandRegex = /([MmLlHhVvCcSsQqTtAaZz])([^MmLlHhVvCcSsQqTtAaZz]*)/g;
+        let newD = '';
+        let match;
+
+        while ((match = commandRegex.exec(d)) !== null) {
+            const command = match[1];
+            const argsStr = match[2].trim();
+            const args = argsStr.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/ig)?.map(parseFloat) || [];
+            let transformedArgs: number[] = [];
+
+            switch (command) {
+                case 'M': case 'L': case 'T':
+                    for (let i = 0; i < args.length; i += 2) transformedArgs.push(args[i] + dx, args[i + 1] + dy);
+                    break;
+                case 'm':
+                    if (newD === '') { // First m acts as absolute M
+                        transformedArgs.push(args[0] + dx, args[1] + dy);
+                        for (let i = 2; i < args.length; i++) transformedArgs.push(args[i]);
+                    } else transformedArgs = args;
+                    break;
+                case 'l': case 't': case 'h': case 'v': case 'c': case 's': case 'q': case 'a':
+                    transformedArgs = args;
+                    break;
+                case 'H':
+                    for (let i = 0; i < args.length; i++) transformedArgs.push(args[i] + dx);
+                    break;
+                case 'V':
+                    for (let i = 0; i < args.length; i++) transformedArgs.push(args[i] + dy);
+                    break;
+                case 'C':
+                    for (let i = 0; i < args.length; i += 6) transformedArgs.push(args[i] + dx, args[i + 1] + dy, args[i + 2] + dx, args[i + 3] + dy, args[i + 4] + dx, args[i + 5] + dy);
+                    break;
+                case 'S': case 'Q':
+                    for (let i = 0; i < args.length; i += 4) transformedArgs.push(args[i] + dx, args[i + 1] + dy, args[i + 2] + dx, args[i + 3] + dy);
+                    break;
+                case 'A':
+                    for (let i = 0; i < args.length; i += 7) transformedArgs.push(args[i], args[i + 1], args[i + 2], args[i + 3], args[i + 4], args[i + 5] + dx, args[i + 6] + dy);
+                    break;
+                case 'Z': case 'z':
+                    break;
+            }
+            newD += command + ' ' + transformedArgs.map(n => isNaN(n) ? '' : n).join(' ') + ' ';
+        }
+        return newD.trim();
+    }
+
+    onSectionMouseDown(event: MouseEvent, section: VenueSection) {
+        if (this.tool === 'move') {
+            this.movingSection = section;
+            const coords = this.getMapCoordinates(event);
+            this.moveStartX = coords.x;
+            this.moveStartY = coords.y;
+            this.originalPathData = section.visualData || '';
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }
+
     onMouseMove(event: MouseEvent) {
         if (this.isDragging) {
             const dx = event.clientX - this.lastMouseX;
@@ -493,10 +652,23 @@ export class VenueFormComponent implements OnInit {
         if (this.isDrawing) {
             this.cursorPos = this.getMapCoordinates(event);
         }
+
+        if (this.movingSection && this.originalPathData) {
+            const coords = this.getMapCoordinates(event);
+            const dx = coords.x - this.moveStartX;
+            const dy = coords.y - this.moveStartY;
+            if (dx !== 0 || dy !== 0) {
+                this.movingSection.visualData = this.translatePathString(this.originalPathData, dx, dy);
+            }
+        }
     }
 
     onMouseUp(event: MouseEvent) {
         this.isDragging = false;
+        if (this.movingSection) {
+            this.movingSection = null;
+            this.originalPathData = '';
+        }
     }
 
     onWheel(event: WheelEvent) {

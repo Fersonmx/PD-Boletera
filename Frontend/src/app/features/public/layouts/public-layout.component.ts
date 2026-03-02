@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { CategoryService, Category } from '../../../core/services/category.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 
@@ -34,17 +35,15 @@ import { CommonModule } from '@angular/common';
               </div>
 
             <!-- Desktop Nav -->
-            <nav class="hidden md:flex space-x-8 items-center">
+            <nav class="hidden md:flex space-x-8 items-center cursor-pointer">
+              @for (cat of topCategories().slice(0, 3); track cat.id) {
+                  <a [routerLink]="['/events']" [queryParams]="{category: cat.id}" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors relative group">
+                    {{ cat.name }}
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
+                  </a>
+              }
               <a routerLink="/events" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors relative group">
-                {{ 'NAV.CONCERTS' | translate }}
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
-              </a>
-              <a routerLink="/events" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors relative group">
-                {{ 'NAV.SPORTS' | translate }}
-                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
-              </a>,
-              <a routerLink="/events" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors relative group">
-                {{ 'NAV.THEATER' | translate }}
+                MÁS...
                 <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full"></span>
               </a>
             </nav>
@@ -87,9 +86,10 @@ import { CommonModule } from '@angular/common';
         <!-- Mobile Menu Overlay -->
         @if (isMobileMenuOpen()) {
             <div class="md:hidden absolute top-20 left-0 w-full bg-white border-b border-gray-100 shadow-xl py-4 px-6 flex flex-col space-y-4 animate-fadeIn">
-                <a routerLink="/events" (click)="closeMobileMenu()" class="text-lg font-bold text-gray-900 py-2 border-b border-gray-50">{{ 'NAV.CONCERTS' | translate }}</a>
-                <a routerLink="/events" (click)="closeMobileMenu()" class="text-lg font-bold text-gray-900 py-2 border-b border-gray-50">{{ 'NAV.SPORTS' | translate }}</a>
-                <a routerLink="/events" (click)="closeMobileMenu()" class="text-lg font-bold text-gray-900 py-2 border-b border-gray-50">{{ 'NAV.THEATER' | translate }}</a>
+                @for (cat of topCategories().slice(0, 3); track cat.id) {
+                    <a [routerLink]="['/events']" [queryParams]="{category: cat.id}" (click)="closeMobileMenu()" class="text-lg font-bold text-gray-900 py-2 border-b border-gray-50 uppercase">{{ cat.name }}</a>
+                }
+                <a routerLink="/events" (click)="closeMobileMenu()" class="text-lg font-bold text-gray-900 py-2 border-b border-gray-50 uppercase">MÁS EVENTOS...</a>
                 
                 <div class="flex items-center justify-between py-4">
                     <span class="text-sm font-bold text-gray-500 uppercase">Language</span>
@@ -179,17 +179,25 @@ import { CommonModule } from '@angular/common';
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   `]
 })
-export class PublicLayoutComponent {
+export class PublicLayoutComponent implements OnInit {
   currentLang = 'es';
   isMobileMenuOpen = signal(false);
+  topCategories = signal<Category[]>([]);
 
   constructor(
     private translate: TranslateService,
-    public authService: AuthService
+    public authService: AuthService,
+    private categoryService: CategoryService
   ) {
     this.translate.setDefaultLang('es');
     this.translate.use('es');
     this.currentLang = this.translate.currentLang;
+  }
+
+  ngOnInit() {
+    this.categoryService.getCategories().subscribe(cats => {
+      this.topCategories.set(cats);
+    });
   }
 
   switchLang(lang: string) {

@@ -25,7 +25,10 @@ app.get('/', (req, res) => {
 
 // Static files
 const path = require('path');
+// Serve conventionally for local dev (optional but good)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve under /api/uploads so production Nginx automatically proxies to it without breaking SPA rules
+app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 const authRoutes = require('./routes/authRoutes');

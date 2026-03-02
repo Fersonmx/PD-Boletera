@@ -146,7 +146,9 @@
                 "TEST_EMAIL": "Destination Test Email",
                 "BTN_TEST": "Send Test Email",
                 "TESTING": "Testing...",
-                "BTN_SAVE": "Save Configuration"
+                "BTN_SAVE": "Save Configuration",
+                "SAVE": "Save Configuration",
+                "SAVING": "Saving..."
             },
             "WELCOME": {
                 "TITLE": "Welcome Email Template",

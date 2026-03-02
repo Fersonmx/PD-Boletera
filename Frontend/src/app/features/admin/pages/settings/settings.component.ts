@@ -73,21 +73,38 @@ import { TranslateModule } from '@ngx-translate/core';
                         <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'ADMIN.SETTINGS.SMTP.FROM' | translate }}</label>
                         <input type="text" [(ngModel)]="smtpConfig.smtp_from" placeholder="&quot;Boletera Contact&quot; <noreply@example.com>" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
                     </div>
-                    <!-- Test Email Input -->
-                    <div class="md:col-span-2 pt-4 border-t border-gray-100 mt-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'ADMIN.SETTINGS.SMTP.TEST_EMAIL' | translate }}</label>
-                        <div class="flex gap-2">
-                            <input type="email" [(ngModel)]="testEmailAddress" placeholder="you@example.com" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
-                            <button (click)="testSMTPConfig()" [disabled]="isTesting" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition disabled:opacity-50">
-                                @if(isTesting) {
-                                    <i class="fas fa-spinner fa-spin mr-2"></i> {{ 'ADMIN.SETTINGS.SMTP.TESTING' | translate }}
-                                } @else {
-                                    <i class="fas fa-paper-plane mr-2"></i> {{ 'ADMIN.SETTINGS.SMTP.BTN_TEST' | translate }}
-                                }
-                            </button>
-                        </div>
+                    <!-- Test Email & Save Config -->
+                    <div class="md:col-span-2 pt-4 border-t border-gray-100 mt-2 flex flex-col md:flex-row justify-between gap-4">
+                        <div class="flex-1">
+                          <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'ADMIN.SETTINGS.SMTP.TEST_EMAIL' | translate }}</label>
+                          <div class="flex gap-2">
+                              <input type="email" [(ngModel)]="testEmailAddress" placeholder="you@example.com" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
+                              <button (click)="testSMTPConfig()" [disabled]="isTesting" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition disabled:opacity-50 whitespace-nowrap">
+                                  @if(isTesting) {
+                                      <i class="fas fa-spinner fa-spin mr-2"></i> {{ 'ADMIN.SETTINGS.SMTP.TESTING' | translate }}
+                                  } @else {
+                                      <i class="fas fa-paper-plane mr-2"></i> {{ 'ADMIN.SETTINGS.SMTP.BTN_TEST' | translate }}
+                                  }
+                              </button>
+                          </div>
+                      </div>
+                      <div class="flex items-end">
+                         <button (click)="saveSMTPConfig()" [disabled]="isSaving" class="px-6 py-2 w-full md:w-auto bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-lg transition disabled:opacity-50 whitespace-nowrap h-[42px]">
+                            @if(isSaving) {
+                               <i class="fas fa-spinner fa-spin mr-2"></i> {{ 'ADMIN.SETTINGS.SMTP.SAVING' | translate }}
+                            } @else {
+                               <i class="fas fa-save mr-2"></i> {{ 'ADMIN.SETTINGS.SMTP.SAVE' | translate }}
+                            }
+                         </button>
+                      </div>
                     </div>
                 </div>
+
+                @if(alertMessage) {
+                    <div class="mt-4 p-4 rounded-lg" [ngClass]="{'bg-green-50 text-green-800 border-green-200': alertType === 'success', 'bg-red-50 text-red-800 border-red-200': alertType === 'error'}">
+                        <p class="text-sm font-medium">{{ alertMessage }}</p>
+                    </div>
+                }
 
           <!-- Template Management -->
           <div class="bg-violet-50 rounded-xl p-6 border border-violet-100 flex justify-between items-center text-violet-900 mt-6 shadow-sm">

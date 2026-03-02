@@ -85,18 +85,11 @@ import { PromoService } from '../../../../core/services/promo.service';
                           
                           <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'CHECKOUT.LOGIN.TITLE' | translate }}</h3>
                           <p class="text-gray-500 mb-4 text-sm">{{ 'CHECKOUT.LOGIN.DESC' | translate }}</p>
-                          
-                          <div class="space-y-3">
-                             <button (click)="login()" class="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition font-medium text-gray-700">
-                                <i class="fab fa-google text-red-500 mr-2"></i> Continue with Google
-                             </button>
-                             <button (click)="login()" class="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition font-medium text-gray-700">
-                                <i class="fab fa-facebook text-blue-600 mr-2"></i> Continue with Facebook
-                             </button>
-                             <button (click)="login()" class="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition font-medium text-gray-700">
-                                <i class="fas fa-envelope text-gray-500 mr-2"></i> Sign In with Email
-                             </button>
-                          </div>
+                                                    <div class="space-y-3">
+                              <button (click)="login()" class="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition font-medium text-gray-700">
+                                 <i class="fas fa-envelope text-gray-500 mr-2"></i> {{ 'CHECKOUT.LOGIN.TITLE' | translate }}
+                              </button>
+                           </div>
 
                           <!-- Register Section -->
                           <div class="mt-8 pt-6 border-t border-gray-100">
@@ -132,7 +125,7 @@ import { PromoService } from '../../../../core/services/promo.service';
                             </div>
                         </div>
                         <button (click)="nextStep()" class="mt-6 w-full py-3 bg-pink-600 text-white rounded-lg font-bold hover:bg-pink-700 transition">
-                             Continue to Billing
+                             {{ 'CHECKOUT.STEPS.BILLING' | translate }}
                         </button>
                     }
                  </div>
@@ -164,8 +157,8 @@ import { PromoService } from '../../../../core/services/promo.service';
                              <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wide">{{ 'CHECKOUT.BILLING.ADDRESS' | translate }}</h3>
                              
                              <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" [(ngModel)]="guestForm.name" class="w-full border-gray-300 rounded-md shadow-sm p-3 border" placeholder="Cardholder Name">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'CHECKOUT.BILLING.FULL_NAME' | translate }}</label>
+                                <input type="text" [(ngModel)]="guestForm.name" class="w-full border-gray-300 rounded-md shadow-sm p-3 border" placeholder="Full Name">
                              </div>
 
                              <div class="grid grid-cols-2 gap-4">
@@ -208,16 +201,17 @@ import { PromoService } from '../../../../core/services/promo.service';
                   
                   <!-- Event Info Snippet -->
                   <div class="mb-6 pb-6 border-b border-gray-100">
-                      <h4 class="font-bold text-lg mb-1">{{ cartItems()[0]?.name || 'Event Ticket' }}</h4>
-                      <p class="text-sm text-gray-500">{{ 'Wed, Feb 18 • 8:00 PM' }}</p>
-                      <p class="text-sm text-gray-500">Aggie Theater, Fort Collins</p>
+                      <h4 class="font-bold text-lg mb-1">{{ cartItems().length ? cartItems()[0].name : 'Event Ticket' }}</h4>
                   </div>
 
                   <div class="space-y-4 mb-6">
                       <div class="flex justify-between items-center text-sm">
                           <span class="text-gray-600">
                              {{ 'CHECKOUT.ORDER_SUMMARY.QUANTITY' | translate }}: {{ totalCount() }} <br>
-                             <span class="text-xs text-gray-400">Section GA, Row GA</span>
+                             <!-- Optional: detail about tickets -->
+                             @for (item of cartItems(); track item.ticketId) {
+                                  <span class="text-xs text-gray-400 block">- {{ item.quantity }}x {{ item.name }}</span>
+                             }
                           </span>
                           <span class="font-medium">{{ totalPrice() | currency:currency():'symbol':'1.0-0' }}</span>
                       </div>
@@ -353,10 +347,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
    }
 
    login() {
+      // Pass returnUrl so successful login routes back to checkout
       this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/checkout' } });
    }
 
    register() {
+      // Pass returnUrl so successful registration routes back to checkout
       this.router.navigate(['/auth/register'], { queryParams: { returnUrl: '/checkout' } });
    }
 

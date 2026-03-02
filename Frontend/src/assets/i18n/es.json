@@ -146,7 +146,9 @@
                 "TEST_EMAIL": "Correo de Prueba Destino",
                 "BTN_TEST": "Enviar Correo de Prueba",
                 "TESTING": "Probando...",
-                "BTN_SAVE": "Guardar Configuración"
+                "BTN_SAVE": "Guardar Configuración",
+                "SAVE": "Guardar Configuración",
+                "SAVING": "Guardando..."
             },
             "WELCOME": {
                 "TITLE": "Plantilla de Bienvenida",
